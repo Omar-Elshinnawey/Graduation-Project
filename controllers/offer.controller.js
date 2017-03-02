@@ -1,8 +1,8 @@
 var OFFER_STATE = require('../models/offer-state.model');
 var offerModel = require('../models/offer.model');
 var orderModel = require('../models/order.model');
-
 var ERRORS = require('../models/error.model');
+
 var Validator = require('../controllers/validator.controller');
 
 module.exports = class OfferController {
@@ -191,14 +191,14 @@ module.exports = class OfferController {
             return;
         }
 
-        if (price &&  (price < 0 || isNaN(price))) {
+        if (this.validator.validateEmptyOrWhiteSpace(price) &&  (price < 0 || isNaN(price))) {
 
             callback(ERRORS.OFFER.INVALID_PRICE, 'error');
             return;
 
         }
 
-        if (price) {
+        if (this.validator.validateEmptyOrWhiteSpace(price)) {
             offerToBeUpdated.price = price;
         }
 

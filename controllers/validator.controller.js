@@ -4,7 +4,7 @@ module.exports = class Validator{
 
     validateEmptyOrWhiteSpace(args){
             
-        if(!args || !/\S/.test(args))
+        if(args == undefined || !/\S/.test(args))
             return false;
         else
             return true;

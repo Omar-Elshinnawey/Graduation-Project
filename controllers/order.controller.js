@@ -33,7 +33,7 @@ module.exports = class OrderController {
             
         }
 
-        if(!Category || !this.validator.findValue(CATEGORIES, Category)){
+        if(!this.validator.validateEmptyOrWhiteSpace(Category) || !this.validator.findValue(CATEGORIES, Category)){
 
             callback(ERRORS.ORDER.INVALID_CATEGORY, 'error');
             return;
@@ -121,12 +121,12 @@ module.exports = class OrderController {
             return;
         }
 
-        if(Category && !this.validator.findValue(CATEGORIES, Category)){
+        if(this.validator.validateEmptyOrWhiteSpace(Category) && !this.validator.findValue(CATEGORIES, Category)){
             callback(ERRORS.ORDER.INVALID_CATEGORY, 'error');
             return;
         }
 
-        if(Category){
+        if(this.validator.validateEmptyOrWhiteSpace(Category)){
             orderToBeUpdated.Category = Category;
         }
 
