@@ -96,7 +96,8 @@ module.exports = class OrderController {
         orderModel.findOneAndRemove(
             {
                 _id: orderId,
-                customerUsername: customerUsername
+                customerUsername: customerUsername,
+                state: ORDER_STATE.ACTIVE
             }, 
             function(err){
 
@@ -141,7 +142,8 @@ module.exports = class OrderController {
         orderModel.findOneAndUpdate(
             {
                 customerUsername: customerUsername,
-                _id: orderId
+                _id: orderId,
+                state: ORDER_STATE.ACTIVE
             },
             orderToBeUpdated
             ,
