@@ -3,8 +3,9 @@ var passportLocalMongoose = require('passport-local-mongoose');
 var expressSession = require('express-session');
 
 var User = require('../models/user.model');
-var ROLE = require('../models/role.model');
-var ERRORS = require('../models/error.model');
+
+var ROLE = require('../constants/role.constant');
+var ERRORS = require('../constants/error.constant');
 
 var Validator = require('../controllers/validator.controller');
 

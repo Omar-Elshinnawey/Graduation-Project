@@ -1,7 +1,8 @@
-var OFFER_STATE = require('../models/offer-state.model');
 var offerModel = require('../models/offer.model');
 var orderModel = require('../models/order.model');
-var ERRORS = require('../models/error.model');
+
+var ERRORS = require('../constants/error.constant');
+var OFFER_STATE = require('../constants/offer-state.constant');
 
 var Validator = require('../controllers/validator.controller');
 
@@ -209,7 +210,8 @@ module.exports = class OfferController {
         offerModel.findOneAndUpdate(
             {
                 providerUsername: providerUsername,
-                _id: offerId
+                _id: offerId,
+                state: OFFER_STATE.ACTIVE
             },
             offerToBeUpdated
             ,

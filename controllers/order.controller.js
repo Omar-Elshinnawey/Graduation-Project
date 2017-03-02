@@ -1,7 +1,9 @@
 var orderModel = require('../models/order.model');
-var ORDER_STATE = require('../models/order-state.model');
-var CATEGORIES = require('../models/category.model');
-var ERRORS = require('../models/error.model');
+
+var ORDER_STATE = require('../constants/order-state.constant');
+var CATEGORIES = require('../constants/category.constant');
+var ERRORS = require('../constants/error.constant');
+
 var Validator = require('../controllers/validator.controller');
 
 module.exports = class OrderController {
