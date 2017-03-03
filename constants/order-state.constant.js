@@ -1,4 +1,4 @@
-var ORDER_STATE = Object.freeze({
+const ORDER_STATE = Object.freeze({
     ACTIVE : 0,
     CLOSED : 1
 });

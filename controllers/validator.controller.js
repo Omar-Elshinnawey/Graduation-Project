@@ -13,7 +13,7 @@ module.exports = class Validator{
     findValue(obj, value){
         for( var prop in obj){
 
-            if(obj.hasOwnProperty(prop) && obj[prop] === value)
+            if(obj.hasOwnProperty(prop) && obj[prop] == value)
                 return true;
 
         }

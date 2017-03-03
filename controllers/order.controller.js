@@ -1,10 +1,10 @@
-var orderModel = require('../models/order.model');
+const orderModel = require('../models/order.model');
 
-var ORDER_STATE = require('../constants/order-state.constant');
-var CATEGORIES = require('../constants/category.constant');
-var ERRORS = require('../constants/error.constant');
+const ORDER_STATE = require('../constants/order-state.constant');
+const CATEGORIES = require('../constants/category.constant');
+const ERRORS = require('../constants/error.constant');
 
-var Validator = require('../controllers/validator.controller');
+const Validator = require('../controllers/validator.controller');
 
 module.exports = class OrderController {
 
@@ -63,6 +63,7 @@ module.exports = class OrderController {
         });
     }
 
+    // this is for customers to view thier own orders.
     getOrders(customerUsername, callback){
 
         if(!this.validator.validateEmptyOrWhiteSpace(customerUsername)){
@@ -83,6 +84,7 @@ module.exports = class OrderController {
 
     }
 
+    //this is for customers to delete thier own orders.
     deleteOrder(customerUsername, orderId, callback){
 
         if(!this.validator.validateEmptyOrWhiteSpace(customerUsername)){
@@ -159,4 +161,29 @@ module.exports = class OrderController {
             });
 
     }
+
+    //this is for providers to get orders in a specific category
+    getOrdersInCategory(Category, callback){
+
+        if(!this.validator.validateEmptyOrWhiteSpace(Category) || !this.validator.findValue(CATEGORIES, Category)){
+
+            callback(ERRORS.ORDER.INVALID_CATEGORY);
+            return;
+
+        }
+
+        orderModel.find(
+            {
+                Category: Category
+            },
+
+            function(err, result){
+                if(err)
+                    callback(err, 'error');
+                else
+                    callback(null, result);
+            }
+        )
+    }
+
 }

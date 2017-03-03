@@ -1,4 +1,4 @@
-var CATEGORIES = Object.freeze({
+const CATEGORIES = Object.freeze({
     FOOD: 0,
     HANDCRAFT: 1,
     FASHION: 2,

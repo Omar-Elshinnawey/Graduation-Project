@@ -29,6 +29,16 @@ module.exports = Object.freeze({
         OFFERID_MISSING: {
             code: "Offer/missing offer id",
             message: "Offer id is required"
+        },
+
+        OFFER_ALREADY_ACCEPTED: {
+            code: "Offer/already accepted",
+            message: "The selected offer was previously accepted"
+        },
+
+        OFFER_CLOSED: {
+            code: "Offer/offer closed",
+            message: "The selected offer is closed."
         }
     },
     ORDER: {
@@ -96,5 +106,9 @@ module.exports = Object.freeze({
             code: "Auth/national ID missing",
             message: "National Id is required for providers"
         }
+    },
+    UNKOWN: {
+        code: "UNKOWN ERROR",
+        message: "Something wrong happened"
     }
 });

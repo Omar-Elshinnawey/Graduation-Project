@@ -4,7 +4,9 @@ var offerController = new offer();
 
 module.exports = function offerRouter(app){
 
-    app.post('/offers', function(req, res){
+    //CRUD for providers===========================================
+
+    app.post('/myoffers', function(req, res){
 
         offerController.createOffer(
             req.body.providerUsername,
@@ -37,6 +39,43 @@ module.exports = function offerRouter(app){
 
     });
 
+    app.delete('/myoffers/:providerUsername/:offerId',function(req, res){
+
+        offerController.deleteOffer(
+            req.params.providerUsername,
+            req.params.offerId,
+            function(err, result){
+
+                if(err)
+                    res.send(err);
+                else
+                    res.send(result);
+
+            });
+
+    });
+
+    app.put('/myoffers',function(req, res){
+
+        offerController.updateOffer(
+            req.body.providerUsername,
+            req.body.offerId,
+            req.body.description,
+            req.body.price,
+            function(err, result){
+
+                if(err)
+                    res.send(err);
+                else
+                    res.send(result);
+
+            }
+        )
+
+    });
+
+    //Customers=======================================================
+
     app.get('/offers/:customerUsername/:orderId', function(req, res){
 
         offerController.getOffersForOrder(
@@ -53,38 +92,17 @@ module.exports = function offerRouter(app){
 
     });
 
-    app.delete('/offers/:providerUsername/:offerId',function(req, res){
+    app.put('/offers', function(req, res){
 
-        offerController.deleteOffer(
-            req.params.providerUsername,
-            req.params.offerId,
-            function(err, result){
+        offerController.acceptOffer(req.body.customerUsername, req.body.offerId,
+        function(err, result){
+            
+            if(err)
+                res.send(err);
+            else
+                res.send(result);
 
-                if(err)
-                    res.send(err);
-                else
-                    res.send(result);
-
-            });
-
-    });
-
-    app.put('/offers',function(req, res){
-
-        offerController.updateOffer(
-            req.body.providerUsername,
-            req.body.offerId,
-            req.body.description,
-            req.body.price,
-            function(err, result){
-
-                if(err)
-                    res.send(err);
-                else
-                    res.send(result);
-
-            }
-        )
+        });
 
     });
 

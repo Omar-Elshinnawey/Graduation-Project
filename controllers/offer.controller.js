@@ -1,10 +1,10 @@
-var offerModel = require('../models/offer.model');
-var orderModel = require('../models/order.model');
+const offerModel = require('../models/offer.model');
+const orderModel = require('../models/order.model');
 
-var ERRORS = require('../constants/error.constant');
-var OFFER_STATE = require('../constants/offer-state.constant');
+const ERRORS = require('../constants/error.constant');
+const OFFER_STATE = require('../constants/offer-state.constant');
 
-var Validator = require('../controllers/validator.controller');
+const Validator = require('../controllers/validator.controller');
 
 module.exports = class OfferController {
 
@@ -75,6 +75,7 @@ module.exports = class OfferController {
             });
     }
 
+    //this is for providers to get thier own offers
     getOffersForProvider(providerUsername, callback) {
 
         if (!this.validator.validateEmptyOrWhiteSpace(providerUsername)) {
@@ -99,6 +100,7 @@ module.exports = class OfferController {
 
     }
 
+    //this is for customers to get offers for thier orders
     getOffersForOrder(customerUsername, orderId, callback) {
 
         if (!this.validator.validateEmptyOrWhiteSpace(customerUsername)) {
@@ -144,6 +146,7 @@ module.exports = class OfferController {
 
     }
 
+    //this is for providers to delete thier own offers
     deleteOffer(providerUsername, offerId, callback) {
 
         if (!this.validator.validateEmptyOrWhiteSpace(providerUsername)) {
@@ -192,7 +195,7 @@ module.exports = class OfferController {
             return;
         }
 
-        if (this.validator.validateEmptyOrWhiteSpace(price) &&  (price < 0 || isNaN(price))) {
+        if (this.validator.validateEmptyOrWhiteSpace(price) && (price < 0 || isNaN(price))) {
 
             callback(ERRORS.OFFER.INVALID_PRICE, 'error');
             return;
@@ -222,6 +225,98 @@ module.exports = class OfferController {
                 else
                     callback(null, 'updated');
 
+            });
+
+    }
+
+    acceptOffer(customerUsername, offerId, callback) {
+
+        if (!this.validator.validateEmptyOrWhiteSpace(customerUsername)) {
+
+            callback(ERRORS.OFFER.USERNAME_MISSING, 'error');
+            return;
+
+        }
+
+        if (!this.validator.validateEmptyOrWhiteSpace(offerId)) {
+
+            callback(ERRORS.OFFER.OFFERID_MISSING, 'error');
+            return;
+
+        }
+
+        offerModel.findOne(
+            {
+                _id: offerId
+            },
+            function (err, result) {
+
+                if (err)
+                    callback(err, 'fail');
+
+                else {
+
+                    switch (result.state) {
+
+                        case OFFER_STATE.ACCEPTED:
+                            callback(ERRORS.OFFER.OFFER_ALREADY_ACCEPTED, 'fail');
+                            break;
+
+                        case OFFER_STATE.CLOSED:
+                            callback(ERRORS.OFFER.OFFER_CLOSED, 'fail');
+                            break;
+
+                        default:
+
+                            orderModel.count(
+                                {
+                                    _id: result.orderId,
+                                    customerUsername: customerUsername
+                                },
+                                function (err2, count) {
+
+                                    if (err2)
+                                        callback(err2, 'fail');
+
+                                    else
+                                        if (count <= 0)
+                                            callback(ERRORS.OFFER.ORDER_DOESNOT_EXIST, 'fail');
+
+                                        else {
+
+                                            var hasError = false;
+
+                                            offerModel.update(
+                                                {
+                                                    orderId: result.orderId,
+                                                    _id: { "$ne": result._id }
+                                                },
+                                                { state: OFFER_STATE.CLOSED },
+                                                { multi: true },
+                                                function (err, docs) {
+
+                                                    if (err) {
+                                                        callback(err, 'fail');
+                                                        hasError = true;
+                                                    }
+                                                });
+
+                                            if (!hasError) {
+
+                                                result.state = OFFER_STATE.ACCEPTED;
+
+                                                result.save(function (err3, doc, nbAffected) {
+                                                    if (nbAffected === 1)
+                                                        callback(null, 'accepted');
+                                                    else
+                                                        callback(ERRORS.UNKOWN, 'fail');
+                                                });
+                                            }
+                                        }
+                                });
+
+                    }
+                }
             });
 
     }

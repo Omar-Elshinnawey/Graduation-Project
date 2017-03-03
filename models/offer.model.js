@@ -9,8 +9,9 @@ var OfferSchema = new Schema({
     price: Number,
     //picture,
     description: String,
-    state: Number
-
+    state: Number,
+    rating: Number,
+    review:String
 });
 
 var Offer = mongoose.model('Offer', OfferSchema);

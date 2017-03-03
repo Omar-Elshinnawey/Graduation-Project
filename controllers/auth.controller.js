@@ -1,13 +1,13 @@
-var passportLocal = require('passport-local');
-var passportLocalMongoose = require('passport-local-mongoose');
-var expressSession = require('express-session');
+const passportLocal = require('passport-local');
+const passportLocalMongoose = require('passport-local-mongoose');
+const expressSession = require('express-session');
 
-var User = require('../models/user.model');
+const User = require('../models/user.model');
 
-var ROLE = require('../constants/role.constant');
-var ERRORS = require('../constants/error.constant');
+const ROLE = require('../constants/role.constant');
+const ERRORS = require('../constants/error.constant');
 
-var Validator = require('../controllers/validator.controller');
+const Validator = require('../controllers/validator.controller');
 
 module.exports = class AuthController {
 
