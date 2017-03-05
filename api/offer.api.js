@@ -92,7 +92,7 @@ module.exports = function offerRouter(app){
 
     });
 
-    app.put('/offers', function(req, res){
+    app.post('/offers/accept', function(req, res){
 
         offerController.acceptOffer(req.body.customerUsername, req.body.offerId,
         function(err, result){
@@ -103,6 +103,25 @@ module.exports = function offerRouter(app){
                 res.send(result);
 
         });
+
+    });
+
+    app.post('/offers/rate', function(req, res){
+
+        offerController.rateOffer(
+            req.body.customerUsername,
+            req.body.offerId,
+            req.body.review,
+            req.body.rating,
+            function(err, result){
+
+                if(err)
+                    res.send(err);
+                else
+                    res.send(result);
+                    
+            }
+        );
 
     });
 

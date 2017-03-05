@@ -320,4 +320,52 @@ module.exports = class OfferController {
             });
 
     }
+
+    rateOffer(customerUsername, offerId, review, rating, callback) {
+
+        offerModel.findOne(
+            { _id: offerId },
+            function (err, result) {
+
+                if (err)
+                    callback(err, 'fail');
+
+                else {
+
+                    if (result.state === OFFER_STATE.DELIVERED) {
+
+                        orderModel.count(
+                            {
+                                _id: result.orderId,
+                                customerUsername: customerUsername
+                            },
+                            function (err, count) {
+
+                                if (err)
+                                    callback(err, 'fail');
+
+                                else {
+
+                                    if (count === 1) {
+
+                                        result.rating = rating;
+                                        result.review = review;
+
+                                        result.save(function (error, doc, nbAffected) {
+
+                                            if (nbAffected === 1)
+                                                callback(null, 'success');
+                                            else
+                                                callback(ERRORS.UNKOWN, 'fail');
+
+                                        });
+                                    }
+                                }
+                            });
+
+                    }else
+                        callback(ERRORS.OFFER.INVALID_RATING, 'fail');
+                }
+            });
+    }
 }

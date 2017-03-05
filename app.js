@@ -26,7 +26,7 @@ orderApi(app);
 offerApi(app);
 authAPi(app, auth);
 
-mongoose.connect(dbConfig());
+mongoose.connect('mongodb://localhost/dakakenTest');
 
 app.listen(port);
 

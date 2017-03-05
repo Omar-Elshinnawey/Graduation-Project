@@ -39,6 +39,11 @@ module.exports = Object.freeze({
         OFFER_CLOSED: {
             code: "Offer/offer closed",
             message: "The selected offer is closed."
+        },
+
+        INVALID_RATING: {
+            code: "Offer/invalid rating",
+            message: "Rating can only be between {0,5} and you can only rate delivered offers"
         }
     },
     ORDER: {
