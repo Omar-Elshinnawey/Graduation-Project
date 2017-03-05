@@ -6,15 +6,13 @@ const OFFER_STATE = require('../constants/offer-state.constant');
 
 const Validator = require('../controllers/validator.controller');
 
-module.exports = class OfferController {
+function OfferController(){
+    this.validator = new Validator();
+}
 
-    constructor() {
-        this.validator = new Validator();
-    }
+OfferController.prototype.createOffer = function(providerUsername, orderId, price, description, callback){
 
-    createOffer(providerUsername, orderId, price, description, callback) {
-
-        if (!this.validator.validateEmptyOrWhiteSpace(providerUsername)) {
+    if (!this.validator.validateEmptyOrWhiteSpace(providerUsername)) {
 
             callback(ERRORS.OFFER.USERNAME_MISSING, 'error');
             return;
@@ -73,12 +71,11 @@ module.exports = class OfferController {
                     });
                 }
             });
-    }
+}
 
-    //this is for providers to get thier own offers
-    getOffersForProvider(providerUsername, callback) {
+OfferController.prototype.getOffersForProvider = function(providerUsername, callback){
 
-        if (!this.validator.validateEmptyOrWhiteSpace(providerUsername)) {
+    if (!this.validator.validateEmptyOrWhiteSpace(providerUsername)) {
 
             callback(ERRORS.OFFER.USERNAME_MISSING, 'error');
             return;
@@ -97,13 +94,11 @@ module.exports = class OfferController {
                     callback(null, result);
 
             });
+}
 
-    }
+OfferController.prototype.getOffersForOrder = function(customerUsername, orderId, callback){
 
-    //this is for customers to get offers for thier orders
-    getOffersForOrder(customerUsername, orderId, callback) {
-
-        if (!this.validator.validateEmptyOrWhiteSpace(customerUsername)) {
+    if (!this.validator.validateEmptyOrWhiteSpace(customerUsername)) {
 
             callback(ERRORS.OFFER.USERNAME_MISSING, 'error');
             return;
@@ -143,13 +138,11 @@ module.exports = class OfferController {
                         });
                 }
             });
+}
 
-    }
+OfferController.prototype.deleteOffer = function(providerUsername, offerId, callback){
 
-    //this is for providers to delete thier own offers
-    deleteOffer(providerUsername, offerId, callback) {
-
-        if (!this.validator.validateEmptyOrWhiteSpace(providerUsername)) {
+    if (!this.validator.validateEmptyOrWhiteSpace(providerUsername)) {
 
             callback(ERRORS.OFFER.USERNAME_MISSING, 'error');
             return;
@@ -176,14 +169,12 @@ module.exports = class OfferController {
                 else
                     callback(null, result);
 
-            }
-        )
+            });
+}
 
-    }
+OfferController.prototype.updateOffer = function(providerUsername, offerId, description, price, callback){
 
-    updateOffer(providerUsername, offerId, description, price, callback) {
-
-        var offerToBeUpdated = {};
+    var offerToBeUpdated = {};
 
         if (!this.validator.validateEmptyOrWhiteSpace(providerUsername)) {
             callback(ERRORS.OFFER.USERNAME_MISSING, 'error');
@@ -226,12 +217,11 @@ module.exports = class OfferController {
                     callback(null, 'updated');
 
             });
+}
 
-    }
+OfferController.prototype.acceptOffer = function(customerUsername, offerId, callback){
 
-    acceptOffer(customerUsername, offerId, callback) {
-
-        if (!this.validator.validateEmptyOrWhiteSpace(customerUsername)) {
+    if (!this.validator.validateEmptyOrWhiteSpace(customerUsername)) {
 
             callback(ERRORS.OFFER.USERNAME_MISSING, 'error');
             return;
@@ -314,16 +304,14 @@ module.exports = class OfferController {
                                             }
                                         }
                                 });
-
                     }
                 }
             });
+}
 
-    }
+OfferController.prototype.rateOffer = function(customerUsername, offerId, review, rating, callback){
 
-    rateOffer(customerUsername, offerId, review, rating, callback) {
-
-        offerModel.findOne(
+    offerModel.findOne(
             { _id: offerId },
             function (err, result) {
 
@@ -367,5 +355,6 @@ module.exports = class OfferController {
                         callback(ERRORS.OFFER.INVALID_RATING, 'fail');
                 }
             });
-    }
 }
+
+module.exports = OfferController;

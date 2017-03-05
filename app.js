@@ -2,6 +2,7 @@ var express = require('express');
 var bodyparser = require('body-parser');
 var mongoose = require('mongoose');
 var passport = require('passport');
+
 var AuthController = require('./controllers/auth.controller');
 const dbConfig = require('./config/db.config');
 
@@ -20,13 +21,13 @@ auth.setup(app);
 app.use(bodyparser.json());
 app.use(bodyparser.urlencoded({extended: true}));
 
-var port = process.env.port || 3000;
+var port = process.env.PORT || 3000;
 
 orderApi(app);
 offerApi(app);
 authAPi(app, auth);
 
-mongoose.connect('mongodb://localhost/dakakenTest');
+mongoose.connect(dbConfig());
 
 app.listen(port);
 

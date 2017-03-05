@@ -1,24 +1,22 @@
-module.exports = class Validator{
+function Validator() { }
 
-    constructor(){}
+Validator.prototype.validateEmptyOrWhiteSpace = function (args) {
 
-    validateEmptyOrWhiteSpace(args){
-            
-        if(args == undefined || !/\S/.test(args))
-            return false;
-        else
-            return true;
-    }
-
-    findValue(obj, value){
-        for( var prop in obj){
-
-            if(obj.hasOwnProperty(prop) && obj[prop] == value)
-                return true;
-
-        }
-
+    if (args == undefined || !/\S/.test(args))
         return false;
+    else
+        return true;
+}
+
+Validator.prototype.findValue = function (obj, value) {
+    for (var prop in obj) {
+
+        if (obj.hasOwnProperty(prop) && obj[prop] == value)
+            return true;
+
     }
 
+    return false;
 }
+
+module.exports = Validator;
