@@ -27,7 +27,8 @@ orderApi(app);
 offerApi(app);
 authAPi(app, auth);
 
+mongoose.Promise = global.Promise;
+
 mongoose.connect(dbConfig());
 
 app.listen(port);
-

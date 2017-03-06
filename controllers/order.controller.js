@@ -62,15 +62,16 @@ OrderController.prototype.createOrder = function (customerUsername, description,
 }
 
 // this is for customers to view thier own orders.
-OrderController.prototype.getOrders = function (customerUsername, callback) {
+OrderController.prototype.getOrdersForCustomer = function (customerUsername, callback) {
 
     if (!this.validator.validateEmptyOrWhiteSpace(customerUsername)) {
         callback(ERRORS.ORDER.USERNAME_MISSING, 'error');
         return;
     }
 
-    orderModel.find({ customerUsername: customerUsername },
-
+    orderModel.find(
+        { customerUsername: customerUsername },
+        'title _id',
         function (err, result) {
 
             if (err)
@@ -79,6 +80,7 @@ OrderController.prototype.getOrders = function (customerUsername, callback) {
                 callback(null, result);
 
         });
+
 }
 
 //this is for customers to delete thier own orders.
@@ -170,13 +172,30 @@ OrderController.prototype.getOrdersInCategory = function (Category, callback) {
     }
 
     orderModel.find(
-        {
-            Category: Category
-        },
-
+        { Category: Category },
+        'title _id',
         function (err, result) {
             if (err)
                 callback(err, 'error');
+            else
+                callback(null, result);
+        });
+}
+
+OrderController.prototype.getOrderDetails = function (orderId, callback) {
+
+    if (!this.validator.validateEmptyOrWhiteSpace(orderId)) {
+
+        callback(ERRORS.ORDER.ORDERID_MISSING, 'error');
+        return;
+    }
+
+    orderModel.findById(
+        orderId,
+        function (err, result) {
+
+            if (err)
+                callback(err, 'fail');
             else
                 callback(null, result);
         });

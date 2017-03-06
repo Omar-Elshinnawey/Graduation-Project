@@ -26,9 +26,12 @@ module.exports = function orderRouter(app) {
 
     app.get('/myorders/:customerUsername', function (req, res) {
 
-        orderController.getOrders(req.params.customerUsername,
+        orderController.getOrdersForCustomer(req.params.customerUsername,
             function (err, result) {
-                res.send(result);
+                if(err)
+                    res.send(err);
+                else
+                    res.send(result);
             });
 
 
@@ -71,6 +74,22 @@ module.exports = function orderRouter(app) {
 
         orderController.getOrdersInCategory(
             req.params.Category, 
+            function(err, result){
+
+                if(err)
+                    res.send(err);
+                else
+                    res.send(result);
+            });
+
+    });
+
+    //=============================================================
+
+    app.get('/order/:orderId', function(req, res){
+
+        orderController.getOrderDetails(
+            req.params.orderId,
             function(err, result){
 
                 if(err)

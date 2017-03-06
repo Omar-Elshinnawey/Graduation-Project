@@ -125,4 +125,19 @@ module.exports = function offerRouter(app){
 
     });
 
+    //==================================================================
+
+    app.get('/offer/:offerId', function(req, res){
+
+        offerController.getOfferDetails(
+            req.params.offerId,
+            function(err, result){
+
+                if(err)
+                    res.send(err);
+                else
+                    res.send(result);
+            });
+    });
+
 }
