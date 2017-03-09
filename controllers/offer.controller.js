@@ -327,8 +327,9 @@ OfferController.prototype.acceptOffer = function (customerUsername, offerId, cal
 
 OfferController.prototype.rateOffer = function (customerUsername, offerId, review, rating, callback) {
 
-    offerModel.findOne(
-        { _id: offerId },
+    offerModel.findOne({ _id: offerId })
+        .populate('orderId', 'customerUsername')
+        .exec(
         function (err, result) {
 
             if (err)
@@ -338,35 +339,23 @@ OfferController.prototype.rateOffer = function (customerUsername, offerId, revie
 
                 if (result.state === OFFER_STATE.DELIVERED) {
 
-                    orderModel.count(
-                        {
-                            _id: result.orderId,
-                            customerUsername: customerUsername
-                        },
-                        function (err, count) {
+                    if (result.orderId[0].customerUsername !== customerUsername)
+                        callback(ERRORS.OFFER.ORDER_DOESNOT_EXIST, 'fail');
+                        
+                    else {
 
-                            if (err)
-                                callback(err, 'fail');
+                        result.rating = rating;
+                        result.review = review;
 
-                            else {
+                        result.save(function (error, doc, nbAffected) {
 
-                                if (count === 1) {
+                            if (nbAffected === 1)
+                                callback(null, 'success');
+                            else
+                                callback(ERRORS.UNKOWN, 'fail');
 
-                                    result.rating = rating;
-                                    result.review = review;
-
-                                    result.save(function (error, doc, nbAffected) {
-
-                                        if (nbAffected === 1)
-                                            callback(null, 'success');
-                                        else
-                                            callback(ERRORS.UNKOWN, 'fail');
-
-                                    });
-                                }
-                            }
                         });
-
+                    }
                 } else
                     callback(ERRORS.OFFER.INVALID_RATING, 'fail');
             }
