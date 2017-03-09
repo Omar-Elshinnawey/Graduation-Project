@@ -3,6 +3,7 @@ const orderModel = require('../models/order.model');
 
 const ERRORS = require('../constants/error.constant');
 const OFFER_STATE = require('../constants/offer-state.constant');
+const ORDER_STATE = require('../constants/order-state.constant');
 
 const Validator = require('../controllers/validator.controller');
 
@@ -41,7 +42,8 @@ OfferController.prototype.createOffer = function (providerUsername, orderId, pri
 
     orderModel.count(
         {
-            _id: orderId
+            _id: orderId,
+            state: ORDER_STATE.ACTIVE
         },
         function (err, count) {
 
@@ -131,7 +133,7 @@ OfferController.prototype.getOffersForOrder = function (customerUsername, orderI
                     {
                         orderId: orderId
                     },
-                    'providerUsername price _id',
+                    'providerUsername price state _id',
                     function (error, result) {
 
                         if (error)
@@ -152,9 +154,9 @@ OfferController.prototype.getOfferDetails = function (offerId, callback) {
         return;
     }
 
-    offerModel.findById(
-        offerId,
-        function (err, result) {
+    offerModel.findById(offerId)
+        .populate('orderId', 'customerUsername')
+        .exec(function (err, result) {
 
             if (err)
                 callback(err, 'fail');
@@ -258,10 +260,9 @@ OfferController.prototype.acceptOffer = function (customerUsername, offerId, cal
 
     }
 
-    offerModel.findOne(
-        {
-            _id: offerId
-        },
+    offerModel.findOne({ _id: offerId })
+        .populate('orderId', 'customerUsername')
+        .exec(
         function (err, result) {
 
             if (err)
@@ -269,65 +270,57 @@ OfferController.prototype.acceptOffer = function (customerUsername, offerId, cal
 
             else {
 
-                switch (result.state) {
+                if (result.orderId[0].customerUsername !== customerUsername)
+                    callback(ERRORS.OFFER.ORDER_DOESNOT_EXIST, 'fail');
 
-                    case OFFER_STATE.ACCEPTED:
-                        callback(ERRORS.OFFER.OFFER_ALREADY_ACCEPTED, 'fail');
-                        break;
+                else {
 
-                    case OFFER_STATE.CLOSED:
-                        callback(ERRORS.OFFER.OFFER_CLOSED, 'fail');
-                        break;
+                    switch (result.state) {
 
-                    default:
+                        case OFFER_STATE.ACCEPTED:
+                            callback(ERRORS.OFFER.OFFER_ALREADY_ACCEPTED, 'fail');
+                            break;
 
-                        orderModel.count(
-                            {
-                                _id: result.orderId,
-                                customerUsername: customerUsername
-                            },
-                            function (err2, count) {
+                        case OFFER_STATE.CLOSED:
+                            callback(ERRORS.OFFER.OFFER_CLOSED, 'fail');
+                            break;
 
-                                if (err2)
-                                    callback(err2, 'fail');
+                        default:
 
-                                else
-                                    if (count <= 0)
-                                        callback(ERRORS.OFFER.ORDER_DOESNOT_EXIST, 'fail');
+                            orderModel.findByIdAndUpdate(
+                                result.orderId[0]._id,
+                                { state: ORDER_STATE.CLOSED },
+                                function (e, res) {
 
-                                    else {
+                                    offerModel.update(
+                                        {
+                                            orderId: result.orderId,
+                                            _id: { "$ne": result._id }
+                                        },
+                                        { state: OFFER_STATE.CLOSED },
+                                        { multi: true },
+                                        function (error, docs) {
 
-                                        var hasError = false;
+                                            if (error)
+                                                callback(error, 'fail');
+                                            else {
 
-                                        offerModel.update(
-                                            {
-                                                orderId: result.orderId,
-                                                _id: { "$ne": result._id }
-                                            },
-                                            { state: OFFER_STATE.CLOSED },
-                                            { multi: true },
-                                            function (err, docs) {
+                                                result.state = OFFER_STATE.ACCEPTED;
 
-                                                if (err) {
-                                                    callback(err, 'fail');
-                                                    hasError = true;
-                                                }
-                                            });
+                                                result.save(function (er, doc, nbAffected) {
+                                                    if (nbAffected === 1)
+                                                        callback(null, 'accepted');
+                                                    else
+                                                        callback(ERRORS.UNKOWN, 'fail');
+                                                });
 
-                                        if (!hasError) {
+                                            }
 
-                                            result.state = OFFER_STATE.ACCEPTED;
-
-                                            result.save(function (err3, doc, nbAffected) {
-                                                if (nbAffected === 1)
-                                                    callback(null, 'accepted');
-                                                else
-                                                    callback(ERRORS.UNKOWN, 'fail');
-                                            });
-                                        }
-                                    }
-                            });
+                                        });
+                                });
+                    }
                 }
+
             }
         });
 }

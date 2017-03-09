@@ -71,7 +71,7 @@ OrderController.prototype.getOrdersForCustomer = function (customerUsername, cal
 
     orderModel.find(
         { customerUsername: customerUsername },
-        'title _id',
+        'title _id state',
         function (err, result) {
 
             if (err)
@@ -173,7 +173,7 @@ OrderController.prototype.getOrdersInCategory = function (Category, callback) {
 
     orderModel.find(
         { Category: Category },
-        'title _id',
+        'title _id state',
         function (err, result) {
             if (err)
                 callback(err, 'error');

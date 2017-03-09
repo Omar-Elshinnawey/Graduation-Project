@@ -4,7 +4,7 @@ var Schema = mongoose.Schema;
 
 var OfferSchema = new Schema({
 
-    orderId: String,
+    orderId: [{ type: Schema.Types.ObjectId, ref: 'Order'}],
     providerUsername: String,
     price: Number,
     //picture,
