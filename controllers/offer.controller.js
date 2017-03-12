@@ -327,6 +327,24 @@ OfferController.prototype.acceptOffer = function (customerUsername, offerId, cal
 
 OfferController.prototype.rateOffer = function (customerUsername, offerId, review, rating, callback) {
 
+    if(!this.validator.validateEmptyOrWhiteSpace(customerUsername)){
+
+        callback(ERRORS.OFFER.USERNAME_MISSING, 'fail');
+        return;
+    }
+
+    if(!this.validator.validateEmptyOrWhiteSpace(offerId)){
+
+        callback(ERRORS.OFFER.OFFERID_MISSING, 'fail');
+        return;
+    }
+
+    if(!this.validator.validateEmptyOrWhiteSpace(rating) || rating < 0){
+
+        callback(ERRORS.OFFER.INVALID_RATING, 'fail');
+        return;
+    }
+
     offerModel.findOne({ _id: offerId })
         .populate('orderId', 'customerUsername')
         .exec(
@@ -341,7 +359,7 @@ OfferController.prototype.rateOffer = function (customerUsername, offerId, revie
 
                     if (result.orderId[0].customerUsername !== customerUsername)
                         callback(ERRORS.OFFER.ORDER_DOESNOT_EXIST, 'fail');
-                        
+
                     else {
 
                         result.rating = rating;
@@ -359,6 +377,48 @@ OfferController.prototype.rateOffer = function (customerUsername, offerId, revie
                 } else
                     callback(ERRORS.OFFER.INVALID_RATING, 'fail');
             }
+        });
+}
+
+OfferController.prototype.submitForDelivary = function (providerUsername, offerId, callback) {
+
+    if(!this.validator.validateEmptyOrWhiteSpace(providerUsername)){
+
+        callback(ERRORS.OFFER.USERNAME_MISSING,'fail');
+        return;
+    }
+
+    if(!this.validator.validateEmptyOrWhiteSpace(offerId)){
+
+        callback(ERRORS.OFFER.OFFERID_MISSING, 'fail');
+        return;
+    }
+
+    offerModel.findById(offerId)
+        .exec(function (err, result) {
+
+            if (err)
+                callback(err, 'fail');
+            else
+
+                if (providerUsername !== result.providerUsername)
+                    callback(ERRORS.AUTH.NOT_AUTHERIZED, 'fail');
+                else
+                    if (result.state !== OFFER_STATE.ACCEPTED)
+                        callback(ERRORS.OFFER.INVALID_DELIVERY, 'fail');
+                    else {
+
+                        result.state = OFFER_STATE.ON_ROUTE;
+
+                        result.save(function (error, doc, numAffected) {
+
+                            if (error)
+                                callback(error, 'fail');
+                            else if (numAffected === 1)
+                                callback(null, 'success');
+                            else callback(ERRORS.UNKOWN, 'fail');
+                        });
+                    }
         });
 }
 

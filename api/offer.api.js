@@ -74,6 +74,19 @@ module.exports = function offerRouter(app){
 
     });
 
+    app.put('/myoffers/submit/:offerId/:providerUsername',function(req, res){
+
+        offerController.submitForDelivary(
+            req.params.providerUsername,
+            req.params.offerId,
+            function(err, result){
+                if(err)
+                    res.send(err);
+                else
+                    res.send(result);
+            });
+    });
+
     //Customers=======================================================
 
     app.get('/offers/:customerUsername/:orderId', function(req, res){

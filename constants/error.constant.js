@@ -44,6 +44,11 @@ module.exports = Object.freeze({
         INVALID_RATING: {
             code: "Offer/invalid rating",
             message: "Rating can only be between {0,5} and you can only rate delivered offers"
+        },
+
+        INVALID_DELIVERY:{
+            code: "Offer/invalid delivery",
+            message: "Cannot submit unaccepted offers for delivery"
         }
     },
     ORDER: {
@@ -110,6 +115,11 @@ module.exports = Object.freeze({
         NATIONALID_MISSING: {
             code: "Auth/national ID missing",
             message: "National Id is required for providers"
+        },
+
+        NOT_AUTHERIZED: {
+            code:"Auth/not autherized",
+            message:"You are not autherized access this information"
         }
     },
     UNKOWN: {
