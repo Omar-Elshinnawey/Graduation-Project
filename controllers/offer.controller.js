@@ -1,3 +1,6 @@
+const simplify = require('simplify-commerce');
+const paymentClient = require('../config/simplify-commerce.config');
+
 const offerModel = require('../models/offer.model');
 const orderModel = require('../models/order.model');
 
@@ -11,7 +14,7 @@ function OfferController() {
     this.validator = new Validator();
 }
 
-OfferController.prototype.createOffer = function (providerUsername, orderId, price, description, callback) {
+OfferController.prototype.createOffer = function(providerUsername, orderId, price, description, callback) {
 
     if (!this.validator.validateEmptyOrWhiteSpace(providerUsername)) {
 
@@ -40,12 +43,11 @@ OfferController.prototype.createOffer = function (providerUsername, orderId, pri
 
     }
 
-    orderModel.count(
-        {
+    orderModel.count({
             _id: orderId,
             state: ORDER_STATE.ACTIVE
         },
-        function (err, count) {
+        function(err, count) {
 
             if (count === 0 || err)
 
@@ -63,7 +65,7 @@ OfferController.prototype.createOffer = function (providerUsername, orderId, pri
 
                 });
 
-                offer.save(function (err) {
+                offer.save(function(err) {
 
                     if (err)
                         callback(err, 'fail');
@@ -76,7 +78,7 @@ OfferController.prototype.createOffer = function (providerUsername, orderId, pri
 }
 
 //this is for providers to get thier own offers.
-OfferController.prototype.getOffersForProvider = function (providerUsername, callback) {
+OfferController.prototype.getOffersForProvider = function(providerUsername, callback) {
 
     if (!this.validator.validateEmptyOrWhiteSpace(providerUsername)) {
 
@@ -85,12 +87,11 @@ OfferController.prototype.getOffersForProvider = function (providerUsername, cal
 
     }
 
-    offerModel.find(
-        {
+    offerModel.find({
             providerUsername: providerUsername
         },
         'providerUsername price _id',
-        function (err, result) {
+        function(err, result) {
 
             if (err)
                 callback(err, 'error');
@@ -101,7 +102,7 @@ OfferController.prototype.getOffersForProvider = function (providerUsername, cal
 }
 
 //this is for customers to get offers for thier own order.
-OfferController.prototype.getOffersForOrder = function (customerUsername, orderId, callback) {
+OfferController.prototype.getOffersForOrder = function(customerUsername, orderId, callback) {
 
     if (!this.validator.validateEmptyOrWhiteSpace(customerUsername)) {
 
@@ -117,11 +118,10 @@ OfferController.prototype.getOffersForOrder = function (customerUsername, orderI
 
     }
 
-    orderModel.count(
-        {
+    orderModel.count({
             _id: orderId
         },
-        function (err, count) {
+        function(err, count) {
 
             if (count === 0 || err)
 
@@ -129,12 +129,11 @@ OfferController.prototype.getOffersForOrder = function (customerUsername, orderI
 
             else {
 
-                offerModel.find(
-                    {
+                offerModel.find({
                         orderId: orderId
                     },
                     'providerUsername price state _id',
-                    function (error, result) {
+                    function(error, result) {
 
                         if (error)
                             callback(error, 'error');
@@ -146,7 +145,7 @@ OfferController.prototype.getOffersForOrder = function (customerUsername, orderI
         });
 }
 
-OfferController.prototype.getOfferDetails = function (offerId, callback) {
+OfferController.prototype.getOfferDetails = function(offerId, callback) {
 
     if (!this.validator.validateEmptyOrWhiteSpace(offerId)) {
 
@@ -156,7 +155,7 @@ OfferController.prototype.getOfferDetails = function (offerId, callback) {
 
     offerModel.findById(offerId)
         .populate('orderId', 'customerUsername')
-        .exec(function (err, result) {
+        .exec(function(err, result) {
 
             if (err)
                 callback(err, 'fail');
@@ -165,7 +164,7 @@ OfferController.prototype.getOfferDetails = function (offerId, callback) {
         });
 }
 
-OfferController.prototype.deleteOffer = function (providerUsername, offerId, callback) {
+OfferController.prototype.deleteOffer = function(providerUsername, offerId, callback) {
 
     if (!this.validator.validateEmptyOrWhiteSpace(providerUsername)) {
 
@@ -181,13 +180,12 @@ OfferController.prototype.deleteOffer = function (providerUsername, offerId, cal
 
     }
 
-    offerModel.findOneAndRemove(
-        {
+    offerModel.findOneAndRemove({
             _id: offerId,
             providerUsername: providerUsername,
             state: OFFER_STATE.ACTIVE
         },
-        function (err, result) {
+        function(err, result) {
 
             if (err)
                 callback(err, 'error');
@@ -197,7 +195,7 @@ OfferController.prototype.deleteOffer = function (providerUsername, offerId, cal
         });
 }
 
-OfferController.prototype.updateOffer = function (providerUsername, offerId, description, price, callback) {
+OfferController.prototype.updateOffer = function(providerUsername, offerId, description, price, callback) {
 
     var offerToBeUpdated = {};
 
@@ -226,15 +224,13 @@ OfferController.prototype.updateOffer = function (providerUsername, offerId, des
         offerToBeUpdated.description = description;
     }
 
-    offerModel.findOneAndUpdate(
-        {
+    offerModel.findOneAndUpdate({
             providerUsername: providerUsername,
             _id: offerId,
             state: OFFER_STATE.ACTIVE
         },
-        offerToBeUpdated
-        ,
-        function (err, result) {
+        offerToBeUpdated,
+        function(err, result) {
 
             if (err)
                 callback(err, 'failed');
@@ -244,7 +240,7 @@ OfferController.prototype.updateOffer = function (providerUsername, offerId, des
         });
 }
 
-OfferController.prototype.acceptOffer = function (customerUsername, offerId, callback) {
+OfferController.prototype.acceptOffer = function(customerUsername, offerId, paymentObject, callback) {
 
     if (!this.validator.validateEmptyOrWhiteSpace(customerUsername)) {
 
@@ -263,83 +259,98 @@ OfferController.prototype.acceptOffer = function (customerUsername, offerId, cal
     offerModel.findOne({ _id: offerId })
         .populate('orderId', 'customerUsername')
         .exec(
-        function (err, result) {
+            function(err, result) {
 
-            if (err)
-                callback(err, 'fail');
-
-            else {
-
-                if (result.orderId[0].customerUsername !== customerUsername)
-                    callback(ERRORS.OFFER.ORDER_DOESNOT_EXIST, 'fail');
+                if (err)
+                    callback(err, 'fail');
 
                 else {
 
-                    switch (result.state) {
+                    if (result.orderId[0].customerUsername !== customerUsername)
+                        callback(ERRORS.OFFER.ORDER_DOESNOT_EXIST, 'fail');
 
-                        case OFFER_STATE.ACCEPTED:
-                            callback(ERRORS.OFFER.OFFER_ALREADY_ACCEPTED, 'fail');
-                            break;
+                    else {
 
-                        case OFFER_STATE.CLOSED:
-                            callback(ERRORS.OFFER.OFFER_CLOSED, 'fail');
-                            break;
+                        switch (result.state) {
 
-                        default:
+                            case OFFER_STATE.ACCEPTED:
+                                callback(ERRORS.OFFER.OFFER_ALREADY_ACCEPTED, 'fail');
+                                break;
 
-                            orderModel.findByIdAndUpdate(
-                                result.orderId[0]._id,
-                                { state: ORDER_STATE.CLOSED },
-                                function (e, res) {
+                            case OFFER_STATE.CLOSED:
+                                callback(ERRORS.OFFER.OFFER_CLOSED, 'fail');
+                                break;
 
-                                    offerModel.update(
-                                        {
-                                            orderId: result.orderId,
-                                            _id: { "$ne": result._id }
-                                        },
-                                        { state: OFFER_STATE.CLOSED },
-                                        { multi: true },
-                                        function (error, docs) {
+                            default:
 
-                                            if (error)
-                                                callback(error, 'fail');
-                                            else {
+                                orderModel.findByIdAndUpdate(
+                                    result.orderId[0]._id, { state: ORDER_STATE.CLOSED },
+                                    function(e, res) {
 
-                                                result.state = OFFER_STATE.ACCEPTED;
+                                        offerModel.update({
+                                                orderId: result.orderId,
+                                                _id: { "$ne": result._id }
+                                            }, { state: OFFER_STATE.CLOSED }, { multi: true },
+                                            function(error, docs) {
 
-                                                result.save(function (er, doc, nbAffected) {
-                                                    if (nbAffected === 1)
-                                                        callback(null, 'accepted');
-                                                    else
-                                                        callback(ERRORS.UNKOWN, 'fail');
-                                                });
+                                                if (error)
+                                                    callback(error, 'fail');
+                                                else {
 
-                                            }
+                                                    result.state = OFFER_STATE.ACCEPTED;
 
-                                        });
-                                });
+                                                    result.save(function(er, doc, nbAffected) {
+                                                        if (nbAffected === 1) {
+
+                                                            paymentClient.payment.create({
+                                                                    amount: paymentObject.amount,
+                                                                    card: {
+                                                                        expMonth: paymentObject.emonth,
+                                                                        expYear: paymentObject.eyear,
+                                                                        cvc: paymentObject.cvc,
+                                                                        number: paymentObject.number,
+                                                                        name: paymentObject.name
+                                                                    },
+                                                                },
+                                                                function(errData, data) {
+
+                                                                    if (errData) {
+                                                                        callback(errData.data.error.message, 'fail');
+                                                                    } else {
+                                                                        //TODO: save payment information.
+                                                                        callback(null, 'accepted');
+                                                                    }
+                                                                });
+                                                        } else
+                                                            callback(ERRORS.UNKOWN, 'fail');
+                                                    });
+
+                                                }
+
+                                            });
+                                    });
+                        }
                     }
-                }
 
-            }
-        });
+                }
+            });
 }
 
-OfferController.prototype.rateOffer = function (customerUsername, offerId, review, rating, callback) {
+OfferController.prototype.rateOffer = function(customerUsername, offerId, review, rating, callback) {
 
-    if(!this.validator.validateEmptyOrWhiteSpace(customerUsername)){
+    if (!this.validator.validateEmptyOrWhiteSpace(customerUsername)) {
 
         callback(ERRORS.OFFER.USERNAME_MISSING, 'fail');
         return;
     }
 
-    if(!this.validator.validateEmptyOrWhiteSpace(offerId)){
+    if (!this.validator.validateEmptyOrWhiteSpace(offerId)) {
 
         callback(ERRORS.OFFER.OFFERID_MISSING, 'fail');
         return;
     }
 
-    if(!this.validator.validateEmptyOrWhiteSpace(rating) || rating < 0){
+    if (!this.validator.validateEmptyOrWhiteSpace(rating) || rating < 0) {
 
         callback(ERRORS.OFFER.INVALID_RATING, 'fail');
         return;
@@ -348,77 +359,77 @@ OfferController.prototype.rateOffer = function (customerUsername, offerId, revie
     offerModel.findOne({ _id: offerId })
         .populate('orderId', 'customerUsername')
         .exec(
-        function (err, result) {
+            function(err, result) {
 
-            if (err)
-                callback(err, 'fail');
+                if (err)
+                    callback(err, 'fail');
 
-            else {
+                else {
 
-                if (result.state === OFFER_STATE.DELIVERED) {
+                    if (result.state === OFFER_STATE.DELIVERED) {
 
-                    if (result.orderId[0].customerUsername !== customerUsername)
-                        callback(ERRORS.OFFER.ORDER_DOESNOT_EXIST, 'fail');
+                        if (result.orderId[0].customerUsername !== customerUsername)
+                            callback(ERRORS.OFFER.ORDER_DOESNOT_EXIST, 'fail');
 
-                    else {
+                        else {
 
-                        result.rating = rating;
-                        result.review = review;
+                            result.rating = rating;
+                            result.review = review;
 
-                        result.save(function (error, doc, nbAffected) {
+                            result.save(function(error, doc, nbAffected) {
 
-                            if (nbAffected === 1)
-                                callback(null, 'success');
-                            else
-                                callback(ERRORS.UNKOWN, 'fail');
+                                if (nbAffected === 1)
+                                    callback(null, 'success');
+                                else
+                                    callback(ERRORS.UNKOWN, 'fail');
 
-                        });
-                    }
-                } else
-                    callback(ERRORS.OFFER.INVALID_RATING, 'fail');
-            }
-        });
+                            });
+                        }
+                    } else
+                        callback(ERRORS.OFFER.INVALID_RATING, 'fail');
+                }
+            });
 }
 
-OfferController.prototype.submitForDelivary = function (providerUsername, offerId, callback) {
+OfferController.prototype.submitForDelivary = function(providerUsername, offerId, callback) {
 
-    if(!this.validator.validateEmptyOrWhiteSpace(providerUsername)){
+    if (!this.validator.validateEmptyOrWhiteSpace(providerUsername)) {
 
-        callback(ERRORS.OFFER.USERNAME_MISSING,'fail');
+        callback(ERRORS.OFFER.USERNAME_MISSING, 'fail');
         return;
     }
 
-    if(!this.validator.validateEmptyOrWhiteSpace(offerId)){
+    if (!this.validator.validateEmptyOrWhiteSpace(offerId)) {
 
         callback(ERRORS.OFFER.OFFERID_MISSING, 'fail');
         return;
     }
 
     offerModel.findById(offerId)
-        .exec(function (err, result) {
+        .exec(function(err, result) {
 
             if (err)
                 callback(err, 'fail');
             else
 
-                if (providerUsername !== result.providerUsername)
-                    callback(ERRORS.AUTH.NOT_AUTHERIZED, 'fail');
-                else
-                    if (result.state !== OFFER_STATE.ACCEPTED)
-                        callback(ERRORS.OFFER.INVALID_DELIVERY, 'fail');
-                    else {
+            if (providerUsername !== result.providerUsername)
+                callback(ERRORS.AUTH.NOT_AUTHERIZED, 'fail');
+            else
+            if (result.state !== OFFER_STATE.ACCEPTED)
+                callback(ERRORS.OFFER.INVALID_DELIVERY, 'fail');
+            else {
 
-                        result.state = OFFER_STATE.ON_ROUTE;
+                result.state = OFFER_STATE.ON_ROUTE;
 
-                        result.save(function (error, doc, numAffected) {
+                result.save(function(error, doc, numAffected) {
 
-                            if (error)
-                                callback(error, 'fail');
-                            else if (numAffected === 1)
-                                callback(null, 'success');
-                            else callback(ERRORS.UNKOWN, 'fail');
-                        });
-                    }
+                    if (error)
+                        callback(error, 'fail');
+                    else if (numAffected === 1)
+                        callback(null, 'success');
+                    else callback(ERRORS.UNKOWN, 'fail');
+                });
+            }
         });
 }
 

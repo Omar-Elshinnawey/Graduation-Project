@@ -16,6 +16,7 @@
     "mongoose": "^4.8.4",
     "passport": "^0.3.2",
     "passport-local": "^1.0.0",
-    "passport-local-mongoose": "^4.0.0"
+    "passport-local-mongoose": "^4.0.0",
+    "simplify-commerce": "^1.6.0"
   }
 }

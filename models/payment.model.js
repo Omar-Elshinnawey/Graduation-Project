@@ -4,9 +4,10 @@ var Schema = mongoose.Schema;
 
 var PaymentSchema = new Schema({
 
-    orderId: String,
-    offerId: String,
-    date: Date
+    orderId: [{ type: Schema.Types.ObjectId, ref: 'Order' }],
+    offerId: [{ type: Schema.Types.ObjectId, ref: 'Offer' }],
+    date: Date,
+    paymentId: String
 
 });
 
