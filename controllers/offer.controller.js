@@ -3,6 +3,7 @@ const paymentClient = require('../config/simplify-commerce.config');
 
 const offerModel = require('../models/offer.model');
 const orderModel = require('../models/order.model');
+const paymentModel = require('../models/payment.model');
 
 const ERRORS = require('../constants/error.constant');
 const OFFER_STATE = require('../constants/offer-state.constant');
@@ -297,36 +298,41 @@ OfferController.prototype.acceptOffer = function(customerUsername, offerId, paym
                                                     callback(error, 'fail');
                                                 else {
 
-                                                    result.state = OFFER_STATE.ACCEPTED;
+                                                    paymentClient.payment.create({
+                                                            amount: paymentObject.amount,
+                                                            card: {
+                                                                expMonth: paymentObject.emonth,
+                                                                expYear: paymentObject.eyear,
+                                                                cvc: paymentObject.cvc,
+                                                                number: paymentObject.number,
+                                                                name: paymentObject.name
+                                                            },
+                                                        },
+                                                        function(errData, data) {
+                                                            if (errData) {
+                                                                callback(errData.data.error.message, 'fail');
+                                                            } else {
 
-                                                    result.save(function(er, doc, nbAffected) {
-                                                        if (nbAffected === 1) {
+                                                                result.state = OFFER_STATE.ACCEPTED;
 
-                                                            paymentClient.payment.create({
-                                                                    amount: paymentObject.amount,
-                                                                    card: {
-                                                                        expMonth: paymentObject.emonth,
-                                                                        expYear: paymentObject.eyear,
-                                                                        cvc: paymentObject.cvc,
-                                                                        number: paymentObject.number,
-                                                                        name: paymentObject.name
-                                                                    },
-                                                                },
-                                                                function(errData, data) {
-
-                                                                    if (errData) {
-                                                                        callback(errData.data.error.message, 'fail');
-                                                                    } else {
-                                                                        //TODO: save payment information.
-                                                                        callback(null, 'accepted');
-                                                                    }
+                                                                payment = paymentModel({
+                                                                    orderId: result.orderId[0]._id,
+                                                                    offerId: result._id,
+                                                                    date: Date.now(),
+                                                                    paymentId: data.id
                                                                 });
-                                                        } else
-                                                            callback(ERRORS.UNKOWN, 'fail');
-                                                    });
 
+                                                                payment.save();
+
+                                                                result.save(function(er, doc, nbAffected) {
+                                                                    if (nbAffected === 1) {
+                                                                        callback(null, 'accepted');
+                                                                    } else
+                                                                        callback(ERRORS.UNKOWN, 'fail');
+                                                                });
+                                                            }
+                                                        });
                                                 }
-
                                             });
                                     });
                         }
