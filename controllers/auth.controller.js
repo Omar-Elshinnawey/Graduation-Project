@@ -1,28 +1,25 @@
-const passportLocal = require('passport-local');
-const passportLocalMongoose = require('passport-local-mongoose');
-const expressSession = require('express-session');
-const RedisStore = require('connect-redis')(expressSession);
-
-const User = require('../models/user.model');
-
-const ROLE = require('../constants/role.constant');
-const ERRORS = require('../constants/error.constant');
-
-const Validator = require('../controllers/validator.controller');
+const passportLocal = require('passport-local'),
+    passportLocalMongoose = require('passport-local-mongoose'),
+    expressSession = require('express-session'),
+    RedisStore = require('connect-redis')(expressSession),
+    User = require('../models/user.model'),
+    ROLE = require('../constants/role.constant'),
+    ERRORS = require('../constants/error.constant'),
+    Validator = require('../controllers/validator.controller');
 
 function AuthController(passport) {
     this.passport = passport;
     this.validator = new Validator();
 }
 
-AuthController.prototype.setup = function (app) {
+AuthController.prototype.setup = function(app) {
 
     app.use(expressSession({
-            secret: "abdo took a taxi to the downtown and ate a turkey",
-            store: new RedisStore,
-            resave: false,
-            saveUninitialized: false
-        }));
+        secret: "abdo took a taxi to the downtown and ate a turkey",
+        store: new RedisStore,
+        resave: false,
+        saveUninitialized: false
+    }));
 
 
     app.use(this.passport.initialize());
@@ -33,7 +30,7 @@ AuthController.prototype.setup = function (app) {
     this.passport.deserializeUser(User.deserializeUser());
 }
 
-AuthController.prototype.signup = function (username, password, role, email, name, nationalId, address, phone, callback) {
+AuthController.prototype.signup = function(username, password, role, email, name, nationalId, address, phone, callback) {
 
     if (!this.validator.validateEmptyOrWhiteSpace(username)) {
 
@@ -103,7 +100,7 @@ AuthController.prototype.signup = function (username, password, role, email, nam
     if (role === ROLE.PROVIDER)
         user.nationalId = nationalId;
 
-    User.register(user, new Buffer(password), function (err, account) {
+    User.register(user, new Buffer(password), function(err, account) {
 
         if (err)
             callback(err, false);

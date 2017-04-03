@@ -1,16 +1,14 @@
-const orderModel = require('../models/order.model');
-
-const ORDER_STATE = require('../constants/order-state.constant');
-const CATEGORIES = require('../constants/category.constant');
-const ERRORS = require('../constants/error.constant');
-
-const Validator = require('../controllers/validator.controller');
+const orderModel = require('../models/order.model'),
+    ORDER_STATE = require('../constants/order-state.constant'),
+    CATEGORIES = require('../constants/category.constant'),
+    ERRORS = require('../constants/error.constant'),
+    Validator = require('../controllers/validator.controller');
 
 function OrderController() {
     this.validator = new Validator();
 }
 
-OrderController.prototype.createOrder = function (customerUsername, description, Category, title, callback) {
+OrderController.prototype.createOrder = function(customerUsername, description, Category, title, callback) {
 
     if (!this.validator.validateEmptyOrWhiteSpace(customerUsername)) {
 
@@ -51,7 +49,7 @@ OrderController.prototype.createOrder = function (customerUsername, description,
 
     });
 
-    order.save(function (err) {
+    order.save(function(err) {
 
         if (err)
             callback(err, 'fail');
@@ -62,17 +60,16 @@ OrderController.prototype.createOrder = function (customerUsername, description,
 }
 
 // this is for customers to view thier own orders.
-OrderController.prototype.getOrdersForCustomer = function (customerUsername, callback) {
+OrderController.prototype.getOrdersForCustomer = function(customerUsername, callback) {
 
     if (!this.validator.validateEmptyOrWhiteSpace(customerUsername)) {
         callback(ERRORS.ORDER.USERNAME_MISSING, 'error');
         return;
     }
 
-    orderModel.find(
-        { customerUsername: customerUsername },
+    orderModel.find({ customerUsername: customerUsername },
         'title _id state',
-        function (err, result) {
+        function(err, result) {
 
             if (err)
                 callback(err, 'error');
@@ -84,7 +81,7 @@ OrderController.prototype.getOrdersForCustomer = function (customerUsername, cal
 }
 
 //this is for customers to delete thier own orders.
-OrderController.prototype.deleteOrder = function (customerUsername, orderId, callback) {
+OrderController.prototype.deleteOrder = function(customerUsername, orderId, callback) {
 
     if (!this.validator.validateEmptyOrWhiteSpace(customerUsername)) {
         callback(ERRORS.ORDER.USERNAME_MISSING, 'error');
@@ -96,13 +93,12 @@ OrderController.prototype.deleteOrder = function (customerUsername, orderId, cal
         return;
     }
 
-    orderModel.findOneAndRemove(
-        {
+    orderModel.findOneAndRemove({
             _id: orderId,
             customerUsername: customerUsername,
             state: ORDER_STATE.ACTIVE
         },
-        function (err) {
+        function(err) {
 
             if (err)
                 callback(err, 'fail');
@@ -111,7 +107,7 @@ OrderController.prototype.deleteOrder = function (customerUsername, orderId, cal
         });
 }
 
-OrderController.prototype.updateOrder = function (customerUsername, orderId, description, Category, title, callback) {
+OrderController.prototype.updateOrder = function(customerUsername, orderId, description, Category, title, callback) {
 
     var orderToBeUpdated = {};
 
@@ -142,15 +138,13 @@ OrderController.prototype.updateOrder = function (customerUsername, orderId, des
         orderToBeUpdated.title = title;
     }
 
-    orderModel.findOneAndUpdate(
-        {
+    orderModel.findOneAndUpdate({
             customerUsername: customerUsername,
             _id: orderId,
             state: ORDER_STATE.ACTIVE
         },
-        orderToBeUpdated
-        ,
-        function (err, result) {
+        orderToBeUpdated,
+        function(err, result) {
 
             if (err)
                 callback(err, 'failed');
@@ -162,7 +156,7 @@ OrderController.prototype.updateOrder = function (customerUsername, orderId, des
 }
 
 //this is for providers to get orders in a specific category
-OrderController.prototype.getOrdersInCategory = function (Category, callback) {
+OrderController.prototype.getOrdersInCategory = function(Category, callback) {
 
     if (!this.validator.validateEmptyOrWhiteSpace(Category) || !this.validator.findValue(CATEGORIES, Category)) {
 
@@ -171,10 +165,9 @@ OrderController.prototype.getOrdersInCategory = function (Category, callback) {
 
     }
 
-    orderModel.find(
-        { Category: Category },
+    orderModel.find({ Category: Category },
         'title _id state',
-        function (err, result) {
+        function(err, result) {
             if (err)
                 callback(err, 'error');
             else
@@ -182,7 +175,7 @@ OrderController.prototype.getOrdersInCategory = function (Category, callback) {
         });
 }
 
-OrderController.prototype.getOrderDetails = function (orderId, callback) {
+OrderController.prototype.getOrderDetails = function(orderId, callback) {
 
     if (!this.validator.validateEmptyOrWhiteSpace(orderId)) {
 
@@ -192,7 +185,7 @@ OrderController.prototype.getOrderDetails = function (orderId, callback) {
 
     orderModel.findById(
         orderId,
-        function (err, result) {
+        function(err, result) {
 
             if (err)
                 callback(err, 'fail');

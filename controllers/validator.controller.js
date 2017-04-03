@@ -1,6 +1,6 @@
-function Validator() { }
+function Validator() {}
 
-Validator.prototype.validateEmptyOrWhiteSpace = function (args) {
+Validator.prototype.validateEmptyOrWhiteSpace = function(args) {
 
     if (args == undefined || !/\S/.test(args))
         return false;
@@ -8,7 +8,7 @@ Validator.prototype.validateEmptyOrWhiteSpace = function (args) {
         return true;
 }
 
-Validator.prototype.findValue = function (obj, value) {
+Validator.prototype.findValue = function(obj, value) {
     for (var prop in obj) {
 
         if (obj.hasOwnProperty(prop) && obj[prop] == value)

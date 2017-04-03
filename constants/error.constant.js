@@ -46,9 +46,13 @@ module.exports = Object.freeze({
             message: "Rating can only be between {0,5} and you can only rate delivered offers"
         },
 
-        INVALID_DELIVERY:{
+        INVALID_DELIVERY: {
             code: "Offer/invalid delivery",
             message: "Cannot submit unaccepted offers for delivery"
+        },
+        INVALID_PAYMENT_INFO: {
+            code: "Offer/invalid payment information",
+            message: "Invalid payment information"
         }
     },
     ORDER: {
@@ -118,8 +122,8 @@ module.exports = Object.freeze({
         },
 
         NOT_AUTHERIZED: {
-            code:"Auth/not autherized",
-            message:"You are not autherized access this information"
+            code: "Auth/not autherized",
+            message: "You are not autherized access this information"
         }
     },
     UNKOWN: {

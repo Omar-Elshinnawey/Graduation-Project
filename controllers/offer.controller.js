@@ -1,15 +1,11 @@
-const simplify = require('simplify-commerce');
-const paymentClient = require('../config/simplify-commerce.config');
-
-const offerModel = require('../models/offer.model');
-const orderModel = require('../models/order.model');
-const paymentModel = require('../models/payment.model');
-
-const ERRORS = require('../constants/error.constant');
-const OFFER_STATE = require('../constants/offer-state.constant');
-const ORDER_STATE = require('../constants/order-state.constant');
-
-const Validator = require('../controllers/validator.controller');
+const PaymentInterface = require('../externals/payment'),
+    offerModel = require('../models/offer.model'),
+    orderModel = require('../models/order.model'),
+    paymentModel = require('../models/payment.model'),
+    ERRORS = require('../constants/error.constant'),
+    OFFER_STATE = require('../constants/offer-state.constant'),
+    ORDER_STATE = require('../constants/order-state.constant'),
+    Validator = require('../controllers/validator.controller');
 
 function OfferController() {
     this.validator = new Validator();
@@ -257,6 +253,18 @@ OfferController.prototype.acceptOffer = function(customerUsername, offerId, paym
 
     }
 
+    if (!paymentObject ||
+        !this.validator.validateEmptyOrWhiteSpace(paymentObject.amount) ||
+        !this.validator.validateEmptyOrWhiteSpace(paymentObject.emonth) ||
+        !this.validator.validateEmptyOrWhiteSpace(paymentObject.eyear) ||
+        !this.validator.validateEmptyOrWhiteSpace(paymentObject.cvc) ||
+        !this.validator.validateEmptyOrWhiteSpace(paymentObject.number)) {
+
+        callback(ERRORS.OFFER.INVALID_PAYMENT_INFO, 'fail');
+        return;
+
+    }
+
     offerModel.findOne({ _id: offerId })
         .populate('orderId', 'customerUsername')
         .exec(
@@ -283,61 +291,39 @@ OfferController.prototype.acceptOffer = function(customerUsername, offerId, paym
                                 break;
 
                             default:
+                                PaymentInterface.makePayment(paymentObject, function(err, data) {
 
-                                orderModel.findByIdAndUpdate(
-                                    result.orderId[0]._id, { state: ORDER_STATE.CLOSED },
-                                    function(e, res) {
+                                    if (err) {
+                                        callback(errData.data.error.message, 'fail');
+                                    } else {
+                                        orderModel.findByIdAndUpdate(
+                                            result.orderId[0]._id, { state: ORDER_STATE.CLOSED },
+                                            function(err, result) {}
+                                        );
 
                                         offerModel.update({
                                                 orderId: result.orderId,
                                                 _id: { "$ne": result._id }
                                             }, { state: OFFER_STATE.CLOSED }, { multi: true },
-                                            function(error, docs) {
+                                            function(err, result) {});
 
-                                                if (error)
-                                                    callback(error, 'fail');
-                                                else {
+                                        result.state = OFFER_STATE.ACCEPTED;
+                                        result.save();
 
-                                                    paymentClient.payment.create({
-                                                            amount: paymentObject.amount,
-                                                            card: {
-                                                                expMonth: paymentObject.emonth,
-                                                                expYear: paymentObject.eyear,
-                                                                cvc: paymentObject.cvc,
-                                                                number: paymentObject.number,
-                                                                name: paymentObject.name
-                                                            },
-                                                        },
-                                                        function(errData, data) {
-                                                            if (errData) {
-                                                                callback(errData.data.error.message, 'fail');
-                                                            } else {
+                                        payment = paymentModel({
+                                            orderId: result.orderId[0]._id,
+                                            offerId: result._id,
+                                            date: Date.now(),
+                                            paymentId: data.id
+                                        });
 
-                                                                result.state = OFFER_STATE.ACCEPTED;
+                                        payment.save();
 
-                                                                payment = paymentModel({
-                                                                    orderId: result.orderId[0]._id,
-                                                                    offerId: result._id,
-                                                                    date: Date.now(),
-                                                                    paymentId: data.id
-                                                                });
-
-                                                                payment.save();
-
-                                                                result.save(function(er, doc, nbAffected) {
-                                                                    if (nbAffected === 1) {
-                                                                        callback(null, 'accepted');
-                                                                    } else
-                                                                        callback(ERRORS.UNKOWN, 'fail');
-                                                                });
-                                                            }
-                                                        });
-                                                }
-                                            });
-                                    });
+                                        callback(null, 'accepted');
+                                    }
+                                });
                         }
                     }
-
                 }
             });
 }

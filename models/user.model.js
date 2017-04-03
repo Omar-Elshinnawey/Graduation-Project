@@ -1,5 +1,5 @@
-var mongoose = require('mongoose');
-var passportLocalMongoose = require('passport-local-mongoose');
+const mongoose = require('mongoose'),
+    passportLocalMongoose = require('passport-local-mongoose');
 
 var Schema = mongoose.Schema;
 
