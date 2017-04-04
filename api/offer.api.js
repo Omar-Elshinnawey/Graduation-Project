@@ -183,4 +183,14 @@ module.exports = function offerRouter(app) {
             });
     });
 
+    //TODO: Move this to auth router
+    app.get('/providers/:username', function(req, res) {
+        offerController.getInformation(req.params.username, function(err, average) {
+            if (err)
+                res.send(err);
+            else
+                res.send(JSON.stringify({ average: average }));
+        });
+    });
+
 }
