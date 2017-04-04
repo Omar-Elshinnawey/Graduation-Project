@@ -53,6 +53,14 @@ module.exports = Object.freeze({
         INVALID_PAYMENT_INFO: {
             code: "Offer/invalid payment information",
             message: "Invalid payment information"
+        },
+        REFUND_REASON_MISSING: {
+            code: "Offer/refund reason missing",
+            message: "You must provide a reason for the refund"
+        },
+        ALREADY_REQUESTED_REFUND: {
+            code: "Offer/already requested refund",
+            message: "Cannot submit multiple refund requests"
         }
     },
     ORDER: {

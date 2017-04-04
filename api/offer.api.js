@@ -1,4 +1,5 @@
-var offer = require('../controllers/offer.controller');
+var offer = require('../controllers/offer.controller'),
+    REFUND_TYPE = require('../constants/refund.constant');
 
 var offerController = new offer();
 
@@ -135,6 +136,36 @@ module.exports = function offerRouter(app) {
             }
         );
 
+    });
+
+    app.post('/offers/refund', function(req, res) {
+        offerController.requestRefund(
+            req.body.customerUsername,
+            req.body.offerId,
+            REFUND_TYPE.REFUND,
+            req.body.reason,
+            function(err, result) {
+                if (err)
+                    res.send(err);
+                else
+                    res.send(result);
+            }
+        );
+    });
+
+    app.post('/offers/defect', function(req, res) {
+        offerController.requestRefund(
+            req.body.customerUsername,
+            req.body.offerId,
+            REFUND_TYPE.DEFECT,
+            req.body.reason,
+            function(err, result) {
+                if (err)
+                    res.send(err);
+                else
+                    res.send(result);
+            }
+        );
     });
 
     //==================================================================

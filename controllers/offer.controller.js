@@ -2,9 +2,11 @@ const PaymentInterface = require('../externals/payment'),
     offerModel = require('../models/offer.model'),
     orderModel = require('../models/order.model'),
     paymentModel = require('../models/payment.model'),
+    refundModel = require('../models/refund.model'),
     ERRORS = require('../constants/error.constant'),
     OFFER_STATE = require('../constants/offer-state.constant'),
     ORDER_STATE = require('../constants/order-state.constant'),
+    REFUND_TYPE = require('../constants/refund.constant'),
     Validator = require('../controllers/validator.controller');
 
 function OfferController() {
@@ -421,6 +423,59 @@ OfferController.prototype.submitForDelivary = function(providerUsername, offerId
                         callback(null, 'success');
                     else callback(ERRORS.UNKOWN, 'fail');
                 });
+            }
+        });
+}
+
+OfferController.prototype.requestRefund = function(customerUsername, offerId, type, reason, callback) {
+    if (!this.validator.validateEmptyOrWhiteSpace(customerUsername)) {
+        callback(ERRORS.OFFER.USERNAME_MISSING, 'fail');
+        return;
+    }
+
+    if (!this.validator.validateEmptyOrWhiteSpace(offerId)) {
+        callback(ERRORS.OFFER.OFFERID_MISSING, 'fail');
+        return;
+    }
+
+    if (!this.validator.validateEmptyOrWhiteSpace(reason)) {
+        callback(ERRORS.OFFER.REFUND_REASON_MISSING, 'fail');
+        return;
+    }
+
+    refundModel.count({
+            offerId: offerId
+        },
+        function(err, count) {
+
+            if (err || count >= 1)
+                callback(ERRORS.OFFER.ALREADY_REQUESTED_REFUND, 'fail');
+            else {
+                offerModel.findOne({
+                        _id: offerId,
+                        state: OFFER_STATE.DELIVERED
+                    })
+                    .populate('orderId', 'customerUsername')
+                    .exec(function(err, result) {
+                        if (err || !result || result.length < 1 || result.orderId[0].customerUsername !== customerUsername)
+                            callback(ERRORS.OFFER.ORDER_DOESNOT_EXIST, 'fail');
+                        else {
+                            var refundRequest = refundModel({
+                                offerId: offerId,
+                                type: type,
+                                reason: reason,
+                                data: Date.now()
+                            });
+
+                            refundRequest.save(function(err) {
+                                if (err)
+                                    callback(err, 'fail');
+                                else
+                                    callback(null, 'Success');
+                            });
+
+                        }
+                    });
             }
         });
 }
