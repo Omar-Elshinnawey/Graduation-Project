@@ -26,6 +26,11 @@ module.exports = Object.freeze({
             message: "The order you provided does not exist"
         },
 
+        OFFER_DOESNOT_EXIST: {
+            code: "Offer/offer does not exist",
+            message: "The offer you provided does not exist"
+        },
+
         OFFERID_MISSING: {
             code: "Offer/missing offer id",
             message: "Offer id is required"
@@ -61,6 +66,10 @@ module.exports = Object.freeze({
         ALREADY_REQUESTED_REFUND: {
             code: "Offer/already requested refund",
             message: "Cannot submit multiple refund requests"
+        },
+        NO_RATING: {
+            code: "Offer/no rating",
+            message: "Customer did not leave a review."
         }
     },
     ORDER: {

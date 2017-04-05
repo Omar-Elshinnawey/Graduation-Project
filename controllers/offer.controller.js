@@ -344,7 +344,7 @@ OfferController.prototype.rateOffer = function(customerUsername, offerId, review
         return;
     }
 
-    if (!this.validator.validateEmptyOrWhiteSpace(rating) || rating < 0) {
+    if (!this.validator.validateEmptyOrWhiteSpace(rating) || rating < 1 || rating > 5) {
 
         callback(ERRORS.OFFER.INVALID_RATING, 'fail');
         return;
@@ -383,6 +383,41 @@ OfferController.prototype.rateOffer = function(customerUsername, offerId, review
                         callback(ERRORS.OFFER.INVALID_RATING, 'fail');
                 }
             });
+}
+
+//Kind of useless? verify with team -> get offer details do this.
+OfferController.prototype.getRating = function(providerUsername, offerId, callback) {
+
+    if (!this.validator.validateEmptyOrWhiteSpace(providerUsername)) {
+        callback(ERRORS.OFFER.USERNAME_MISSING, 'fail');
+        return;
+    }
+
+    if (!this.validator.validateEmptyOrWhiteSpace(offerId)) {
+        callback(ERRORS.OFFER.OFFERID_MISSING, 'fail');
+        return;
+    }
+
+    offerModel.findOne({
+        _id: offerId,
+        providerUsername: providerUsername
+    }, function(err, result) {
+
+        if (err || !result || result.length === 0)
+            callback(ERRORS.OFFER.OFFER_DOESNOT_EXIST, 'fail');
+        else {
+            if (!result.rating && !result.review)
+                callback(ERRORS.OFFER.NO_RATING, 'fail');
+            else {
+                var rating = {};
+
+                rating.stars = result.rating;
+                rating.review = result.review;
+
+                callback(null, rating);
+            }
+        }
+    });
 }
 
 OfferController.prototype.submitForDelivary = function(providerUsername, offerId, callback) {
