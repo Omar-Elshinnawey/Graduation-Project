@@ -3,6 +3,7 @@ const passportLocal = require('passport-local'),
     expressSession = require('express-session'),
     RedisStore = require('connect-redis')(expressSession),
     User = require('../models/user.model'),
+    offerModel = require('../models/offer.model'),
     ROLE = require('../constants/role.constant'),
     ERRORS = require('../constants/error.constant'),
     Validator = require('../controllers/validator.controller');
@@ -81,7 +82,7 @@ AuthController.prototype.signup = function(username, password, role, email, name
 
     }
 
-    if (role === ROLE.PROVIDER && !this.validateEmptyOrWhiteSpace(nationalId)) {
+    if (role === ROLE.PROVIDER && !this.validator.validateEmptyOrWhiteSpace(nationalId)) {
 
         callback(ERRORS.AUTH.NATIONALID_MISSING, 'error');
         return;
@@ -108,6 +109,69 @@ AuthController.prototype.signup = function(username, password, role, email, name
             callback(null, true);
 
     });
+}
+
+AuthController.prototype.getInformation = function(providerUsername, callback) {
+
+
+    var information = {};
+
+    User.findOne({
+            name: providerUsername,
+            role: ROLE.PROVIDER
+        },
+        'name',
+        function(err, result) {
+            if (err || !result || result.length === 0)
+                callback(ERRORS.AUTH.PROVIDER_NOT_FOUND, 'fail');
+            else {
+
+                information.name = result.name;
+                getAverageRating(providerUsername, function(err, average) {
+                    if (err)
+                        callback(err, 'fail');
+                    else {
+                        information.average = average;
+                        callback(null, information);
+                    }
+                });
+            }
+        });
+}
+
+function getAverageRating(providerUsername, callback) {
+
+    offerModel.aggregate()
+        .match({
+            providerUsername: providerUsername,
+            rating: { $gte: 1 }
+        })
+        .group({
+            _id: '$rating',
+            count: { $sum: 1 }
+        }).exec(function(err, result) {
+            if (err)
+                callback(err, null);
+            else {
+
+                if (result.length === 0)
+                    callback(null, 0);
+                else {
+                    var total = 0;
+                    var sum = 0;
+
+                    result.forEach(function(element) {
+                        sum += element._id * element.count;
+                        total += element.count;
+                    });
+
+                    const oneDecimalPlace = 10;
+                    var average = Math.round((sum / total) * oneDecimalPlace) / oneDecimalPlace;
+
+                    callback(null, average);
+                }
+            }
+        });
 }
 
 module.exports = AuthController;

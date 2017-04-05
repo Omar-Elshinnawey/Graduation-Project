@@ -132,6 +132,10 @@ module.exports = Object.freeze({
         NOT_AUTHERIZED: {
             code: "Auth/not autherized",
             message: "You are not autherized access this information"
+        },
+        PROVIDER_NOT_FOUND: {
+            code: "Auth/provider not found",
+            message: "No provider with the name provided"
         }
     },
     UNKOWN: {
