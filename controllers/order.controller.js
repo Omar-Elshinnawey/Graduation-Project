@@ -49,6 +49,10 @@ OrderController.prototype.createOrder = function(customerUsername, description, 
 
     });
 
+    /*order.save()
+        .then(callback(null, 'Success'))
+        .catch((err) => callback(err, 'fail'));*/
+
     order.save(function(err) {
 
         if (err)

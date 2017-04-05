@@ -22,8 +22,8 @@ var port = process.env.PORT || 3000;
 orderApi(app);
 offerApi(app);
 authAPi(app, auth);
-
-mongoose.Promise = global.Promise;
+//TODO: USE bluebird!! SAVE YOURSELF FROM CALLBACK HELL!!
+mongoose.Promise = /*require('bluebird')*/ global.Promise;
 
 mongoose.connect(dbConfig());
 
