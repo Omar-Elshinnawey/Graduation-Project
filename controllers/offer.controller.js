@@ -135,7 +135,7 @@ OfferController.prototype.getOfferDetails = function(offerId) {
     return new Promise(function(resolve, reject) {
 
         if (!_self.validator.validateEmptyOrWhiteSpace(offerId)) {
-            callback(ERRORS.OFFER.OFFERID_MISSING, 'error');
+            reject(ERRORS.OFFER.OFFERID_MISSING);
             return;
         }
 

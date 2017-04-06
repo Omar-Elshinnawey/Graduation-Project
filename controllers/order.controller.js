@@ -2,200 +2,178 @@ const orderModel = require('../models/order.model'),
     ORDER_STATE = require('../constants/order-state.constant'),
     CATEGORIES = require('../constants/category.constant'),
     ERRORS = require('../constants/error.constant'),
-    Validator = require('../controllers/validator.controller');
+    Validator = require('../controllers/validator.controller'),
+    Promise = require('bluebird');
 
 function OrderController() {
     this.validator = new Validator();
 }
 
-OrderController.prototype.createOrder = function(customerUsername, description, Category, title, callback) {
+OrderController.prototype.createOrder = function(customerUsername, description, Category, title) {
 
-    if (!this.validator.validateEmptyOrWhiteSpace(customerUsername)) {
+    var _self = this;
 
-        callback(ERRORS.ORDER.USERNAME_MISSING, 'error');
-        return;
+    return new Promise(function(resolve, reject) {
 
-    }
+        if (!_self.validator.validateEmptyOrWhiteSpace(customerUsername)) {
+            reject(ERRORS.ORDER.USERNAME_MISSING);
+            return;
+        }
 
-    if (!this.validator.validateEmptyOrWhiteSpace(description)) {
+        if (!_self.validator.validateEmptyOrWhiteSpace(description)) {
+            reject(ERRORS.ORDER.DESCRIPTION_MISSING);
+            return;
+        }
 
-        callback(ERRORS.ORDER.DESCRIPTION_MISSING, 'error');
-        return;
+        if (!_self.validator.validateEmptyOrWhiteSpace(title)) {
+            reject(ERRORS.ORDER.TITLE_MISSING);
+            return;
+        }
 
-    }
+        if (!_self.validator.validateEmptyOrWhiteSpace(Category) || !_self.validator.findValue(CATEGORIES, Category)) {
+            reject(ERRORS.ORDER.INVALID_CATEGORY);
+            return;
+        }
 
-    if (!this.validator.validateEmptyOrWhiteSpace(title)) {
+        var order = orderModel({
+            customerUsername: customerUsername,
+            description: description,
+            Category: Category,
+            title: title,
+            state: ORDER_STATE.ACTIVE
+        });
 
-        callback(ERRORS.ORDER.TITLE_MISSING, 'error');
-        return;
-
-    }
-
-    if (!this.validator.validateEmptyOrWhiteSpace(Category) || !this.validator.findValue(CATEGORIES, Category)) {
-
-        callback(ERRORS.ORDER.INVALID_CATEGORY, 'error');
-        return;
-
-    }
-
-
-    var order = orderModel({
-
-        customerUsername: customerUsername,
-        description: description,
-        Category: Category,
-        title: title,
-        state: ORDER_STATE.ACTIVE
-
-    });
-
-    /*order.save()
-        .then(callback(null, 'Success'))
-        .catch((err) => callback(err, 'fail'));*/
-
-    order.save(function(err) {
-
-        if (err)
-            callback(err, 'fail');
-        else
-            callback(null, 'Success');
-
+        order.save()
+            .then(resolve('Success'))
+            .catch((err) => reject(err));
     });
 }
 
 // this is for customers to view thier own orders.
-OrderController.prototype.getOrdersForCustomer = function(customerUsername, callback) {
+OrderController.prototype.getOrdersForCustomer = function(customerUsername) {
 
-    if (!this.validator.validateEmptyOrWhiteSpace(customerUsername)) {
-        callback(ERRORS.ORDER.USERNAME_MISSING, 'error');
-        return;
-    }
+    var _self = this;
 
-    orderModel.find({ customerUsername: customerUsername },
-        'title _id state',
-        function(err, result) {
+    return new Promise(function(resolve, reject) {
 
-            if (err)
-                callback(err, 'error');
-            else
-                callback(null, result);
+        if (!_self.validator.validateEmptyOrWhiteSpace(customerUsername)) {
+            reject(ERRORS.ORDER.USERNAME_MISSING);
+            return;
+        }
 
-        });
-
+        orderModel.find({ customerUsername: customerUsername }, 'title _id state')
+            .then((result) => resolve(result))
+            .catch((err) => reject(err));
+    });
 }
 
 //this is for customers to delete thier own orders.
-OrderController.prototype.deleteOrder = function(customerUsername, orderId, callback) {
+OrderController.prototype.deleteOrder = function(customerUsername, orderId) {
 
-    if (!this.validator.validateEmptyOrWhiteSpace(customerUsername)) {
-        callback(ERRORS.ORDER.USERNAME_MISSING, 'error');
-        return;
-    }
+    var _self = this;
 
-    if (!this.validator.validateEmptyOrWhiteSpace(orderId)) {
-        callback(ERRORS.ORDER.ORDERID_MISSING, 'error');
-        return;
-    }
+    return new Promise(function(resolve, reject) {
 
-    orderModel.findOneAndRemove({
-            _id: orderId,
-            customerUsername: customerUsername,
-            state: ORDER_STATE.ACTIVE
-        },
-        function(err) {
+        if (!_self.validator.validateEmptyOrWhiteSpace(customerUsername)) {
+            reject(ERRORS.ORDER.USERNAME_MISSING);
+            return;
+        }
 
-            if (err)
-                callback(err, 'fail');
-            else
-                callback(null, 'deleted');
-        });
+        if (!_self.validator.validateEmptyOrWhiteSpace(orderId)) {
+            reject(ERRORS.ORDER.ORDERID_MISSING);
+            return;
+        }
+
+        orderModel.findOneAndRemove({
+                _id: orderId,
+                customerUsername: customerUsername,
+                state: ORDER_STATE.ACTIVE
+            })
+            .then(resolve('Success'))
+            .catch((err) => reject(err));
+    });
 }
 
-OrderController.prototype.updateOrder = function(customerUsername, orderId, description, Category, title, callback) {
+OrderController.prototype.updateOrder = function(customerUsername, orderId, description, Category, title) {
 
-    var orderToBeUpdated = {};
+    var _self = this;
 
-    if (!this.validator.validateEmptyOrWhiteSpace(customerUsername)) {
-        callback(ERRORS.ORDER.USERNAME_MISSING, 'error');
-        return;
-    }
+    return new Promise(function(resolve, reject) {
 
-    if (!this.validator.validateEmptyOrWhiteSpace(orderId)) {
-        callback(ERRORS.ORDER.ORDERID_MISSING, 'error');
-        return;
-    }
+        var orderToBeUpdated = {};
 
-    if (this.validator.validateEmptyOrWhiteSpace(Category) && !this.validator.findValue(CATEGORIES, Category)) {
-        callback(ERRORS.ORDER.INVALID_CATEGORY, 'error');
-        return;
-    }
+        if (!_self.validator.validateEmptyOrWhiteSpace(customerUsername)) {
+            reject(ERRORS.ORDER.USERNAME_MISSING);
+            return;
+        }
 
-    if (this.validator.validateEmptyOrWhiteSpace(Category)) {
-        orderToBeUpdated.Category = Category;
-    }
+        if (!_self.validator.validateEmptyOrWhiteSpace(orderId)) {
+            reject(ERRORS.ORDER.ORDERID_MISSING);
+            return;
+        }
 
-    if (this.validator.validateEmptyOrWhiteSpace(description)) {
-        orderToBeUpdated.description = description;
-    }
+        if (_self.validator.validateEmptyOrWhiteSpace(Category) && !_self.validator.findValue(CATEGORIES, Category)) {
+            reject(ERRORS.ORDER.INVALID_CATEGORY);
+            return;
+        }
 
-    if (this.validator.validateEmptyOrWhiteSpace(title)) {
-        orderToBeUpdated.title = title;
-    }
+        if (_self.validator.validateEmptyOrWhiteSpace(Category)) {
+            orderToBeUpdated.Category = Category;
+        }
 
-    orderModel.findOneAndUpdate({
-            customerUsername: customerUsername,
-            _id: orderId,
-            state: ORDER_STATE.ACTIVE
-        },
-        orderToBeUpdated,
-        function(err, result) {
+        if (_self.validator.validateEmptyOrWhiteSpace(description)) {
+            orderToBeUpdated.description = description;
+        }
 
-            if (err)
-                callback(err, 'failed');
-            else
-                callback(null, 'updated');
+        if (_self.validator.validateEmptyOrWhiteSpace(title)) {
+            orderToBeUpdated.title = title;
+        }
 
-        });
-
+        orderModel.findOneAndUpdate({
+                    customerUsername: customerUsername,
+                    _id: orderId,
+                    state: ORDER_STATE.ACTIVE
+                },
+                orderToBeUpdated)
+            .then(resolve('Success'))
+            .catch((err) => reject(err));
+    });
 }
 
 //this is for providers to get orders in a specific category
-OrderController.prototype.getOrdersInCategory = function(Category, callback) {
+OrderController.prototype.getOrdersInCategory = function(Category) {
 
-    if (!this.validator.validateEmptyOrWhiteSpace(Category) || !this.validator.findValue(CATEGORIES, Category)) {
+    var _self = this;
 
-        callback(ERRORS.ORDER.INVALID_CATEGORY);
-        return;
+    return new Promise(function(resolve, reject) {
 
-    }
+        if (!_self.validator.validateEmptyOrWhiteSpace(Category) || !_self.validator.findValue(CATEGORIES, Category)) {
+            reject(ERRORS.ORDER.INVALID_CATEGORY);
+            return;
+        }
 
-    orderModel.find({ Category: Category },
-        'title _id state',
-        function(err, result) {
-            if (err)
-                callback(err, 'error');
-            else
-                callback(null, result);
-        });
+        orderModel.find({ Category: Category },
+                'title _id state')
+            .then((result) => resolve(result))
+            .catch((err) => reject(err));
+    });
 }
 
 OrderController.prototype.getOrderDetails = function(orderId, callback) {
 
-    if (!this.validator.validateEmptyOrWhiteSpace(orderId)) {
+    var _self = this;
 
-        callback(ERRORS.ORDER.ORDERID_MISSING, 'error');
-        return;
-    }
+    return new Promise(function(resolve, reject) {
 
-    orderModel.findById(
-        orderId,
-        function(err, result) {
+        if (!_self.validator.validateEmptyOrWhiteSpace(orderId)) {
+            reject(ERRORS.ORDER.ORDERID_MISSING);
+            return;
+        }
 
-            if (err)
-                callback(err, 'fail');
-            else
-                callback(null, result);
-        });
+        orderModel.findById(orderId)
+            .then((result) => resolve(result))
+            .catch((err) => reject(err));
+    });
 }
 
 module.exports = OrderController;
