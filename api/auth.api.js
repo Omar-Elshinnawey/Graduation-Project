@@ -1,29 +1,23 @@
+const passport = require('passport');
 module.exports = function authApi(app, authController) {
 
     app.post('/auth/register', function(req, res) {
 
         authController.signup(
-            req.body.username,
-            req.body.password,
-            req.body.role,
-            req.body.email,
-            req.body.name,
-            req.body.nationalId,
-            req.body.address,
-            req.body.phone,
-            function(err, result) {
-
-                if (err)
-                    res.send(err);
-                else
-                    res.send(result);
-            }
-        )
-
+                req.body.username,
+                req.body.password,
+                req.body.role,
+                req.body.email,
+                req.body.name,
+                req.body.nationalId,
+                req.body.address,
+                req.body.phone)
+            .then((result) => res.send(result))
+            .catch((err) => res.send(err));
     });
 
     app.post('/auth/login',
-        authController.passport.authenticate(
+        passport.authenticate(
             "local", {
                 failureRedirect: "/auth/failed"
             }),
@@ -44,11 +38,9 @@ module.exports = function authApi(app, authController) {
     });
 
     app.get('/providers/:username', function(req, res) {
-        authController.getInformation(req.params.username, function(err, information) {
-            if (err)
-                res.send(err);
-            else
-                res.send(information);
-        });
+
+        authController.getInformation(req.params.username)
+            .then((information) => res.send(information))
+            .catch((err) => res.send(err));
     });
 }

@@ -1,5 +1,5 @@
-const passportLocal = require('passport-local'),
-    passportLocalMongoose = require('passport-local-mongoose'),
+const passport = require('passport'),
+    passportLocal = require('passport-local'),
     expressSession = require('express-session'),
     RedisStore = require('connect-redis')(expressSession),
     User = require('../models/user.model'),
@@ -8,8 +8,7 @@ const passportLocal = require('passport-local'),
     ERRORS = require('../constants/error.constant'),
     Validator = require('../controllers/validator.controller');
 
-function AuthController(passport) {
-    this.passport = passport;
+function AuthController() {
     this.validator = new Validator();
 }
 
@@ -23,139 +22,131 @@ AuthController.prototype.setup = function(app) {
     }));
 
 
-    app.use(this.passport.initialize());
-    app.use(this.passport.session());
-    this.passport.use(new passportLocal(User.authenticate()));
+    app.use(passport.initialize());
+    app.use(passport.session());
+    passport.use(new passportLocal(User.authenticate()));
 
-    this.passport.serializeUser(User.serializeUser());
-    this.passport.deserializeUser(User.deserializeUser());
+    passport.serializeUser(User.serializeUser());
+    passport.deserializeUser(User.deserializeUser());
 }
 
-AuthController.prototype.signup = function(username, password, role, email, name, nationalId, address, phone, callback) {
+AuthController.prototype.signup = function(username, password, role, email, name, nationalId, address, phone) {
 
-    if (!this.validator.validateEmptyOrWhiteSpace(username)) {
+    var _self = this;
 
-        callback(ERRORS.AUTH.USERNAME_MISSING, 'error');
-        return;
+    return new Promise(function(resolve, reject) {
 
-    }
+        if (!_self.validator.validateEmptyOrWhiteSpace(username)) {
+            reject(ERRORS.AUTH.USERNAME_MISSING);
+            return;
+        }
 
-    if (!this.validator.validateEmptyOrWhiteSpace(password)) {
+        if (!_self.validator.validateEmptyOrWhiteSpace(password)) {
+            reject(ERRORS.AUTH.PASSWORD_MISSING);
+            return;
+        }
 
-        callback(ERRORS.AUTH.PASSWORD_MISSING, 'error');
-        return;
+        if (!_self.validator.validateEmptyOrWhiteSpace(email)) {
+            reject(ERRORS.AUTH.EMAIL_MISSING);
+            return;
+        }
 
-    }
+        if (!_self.validator.validateEmptyOrWhiteSpace(name)) {
+            reject(ERRORS.AUTH.NAME_MISSING);
+            return;
+        }
 
-    if (!this.validator.validateEmptyOrWhiteSpace(email)) {
+        if (!_self.validator.validateEmptyOrWhiteSpace(address)) {
+            reject(ERRORS.AUTH.ADDRESS_MISSING);
+            return;
+        }
 
-        callback(ERRORS.AUTH.EMAIL_MISSING, 'error');
-        return;
+        if (!_self.validator.validateEmptyOrWhiteSpace(phone)) {
+            reject(ERRORS.AUTH.PHONE_MISSING);
+            return;
+        }
 
-    }
+        if (!_self.validator.validateEmptyOrWhiteSpace(role) || !_self.validator.findValue(ROLE, role)) {
+            reject(ERRORS.AUTH.INVALID_ROLE);
+            return;
+        }
 
-    if (!this.validator.validateEmptyOrWhiteSpace(name)) {
+        if (role === ROLE.PROVIDER && !_self.validator.validateEmptyOrWhiteSpace(nationalId)) {
+            reject(ERRORS.AUTH.NATIONALID_MISSING);
+            return;
+        }
 
-        callback(ERRORS.AUTH.NAME_MISSING, 'error');
-        return;
-
-    }
-
-    if (!this.validator.validateEmptyOrWhiteSpace(address)) {
-
-        callback(ERRORS.AUTH.ADDRESS_MISSING, 'error');
-        return;
-
-    }
-
-    if (!this.validator.validateEmptyOrWhiteSpace(phone)) {
-
-        callback(ERRORS.AUTH.PHONE_MISSING, 'error');
-        return;
-
-    }
-
-    if (!this.validator.validateEmptyOrWhiteSpace(role) || !this.validator.findValue(ROLE, role)) {
-
-        callback(ERRORS.AUTH.INVALID_ROLE, 'error');
-        return;
-
-    }
-
-    if (role === ROLE.PROVIDER && !this.validator.validateEmptyOrWhiteSpace(nationalId)) {
-
-        callback(ERRORS.AUTH.NATIONALID_MISSING, 'error');
-        return;
-
-    }
-
-    var user = new User({
-        username: username,
-        role: role,
-        email: email,
-        name: name,
-        address: address,
-        phone: phone
-    });
-
-    if (role === ROLE.PROVIDER)
-        user.nationalId = nationalId;
-
-    User.register(user, new Buffer(password), function(err, account) {
-
-        if (err)
-            callback(err, false);
-        else
-            callback(null, true);
-
-    });
-}
-
-AuthController.prototype.getInformation = function(providerUsername, callback) {
-
-
-    var information = {};
-
-    User.findOne({
-            name: providerUsername,
-            role: ROLE.PROVIDER
-        },
-        'name',
-        function(err, result) {
-            if (err || !result || result.length === 0)
-                callback(ERRORS.AUTH.PROVIDER_NOT_FOUND, 'fail');
-            else {
-
-                information.name = result.name;
-                getAverageRating(providerUsername, function(err, average) {
-                    if (err)
-                        callback(err, 'fail');
-                    else {
-                        information.average = average;
-                        callback(null, information);
-                    }
-                });
-            }
+        var user = new User({
+            username: username,
+            role: role,
+            email: email,
+            name: name,
+            address: address,
+            phone: phone
         });
+
+        if (role === ROLE.PROVIDER)
+            user.nationalId = nationalId;
+
+        User.register(user, new Buffer(password), function(err, account) {
+            if (err)
+                reject(err);
+            else
+                resolve(username);
+        });
+    });
 }
 
-function getAverageRating(providerUsername, callback) {
+AuthController.prototype.getInformation = function(providerUsername) {
 
-    offerModel.aggregate()
-        .match({
-            providerUsername: providerUsername,
-            rating: { $gte: 1 }
-        })
-        .group({
-            _id: '$rating',
-            count: { $sum: 1 }
-        }).exec(function(err, result) {
-            if (err)
-                callback(err, null);
-            else {
+    var _self = this;
 
+    return new Promise(function(resolve, reject) {
+
+        if (!_self.validator.validateEmptyOrWhiteSpace(providerUsername)) {
+            reject(ERRORS.AUTH.USERNAME_MISSING);
+            return;
+        }
+
+        var information = {};
+
+        User.findOne({
+                name: providerUsername,
+                role: ROLE.PROVIDER
+            }, 'name')
+            .then((result) => {
+                if (!result || result.length === 0)
+                    reject(ERRORS.AUTH.PROVIDER_NOT_FOUND);
+                else {
+
+                    information.name = result.name;
+                    return getAverageRating(providerUsername);
+                }
+            })
+            .then((average) => {
+                information.average = average;
+                resolve(information);
+            })
+            .catch(err => reject(err));
+
+    });
+}
+
+function getAverageRating(providerUsername) {
+
+    return new Promise(function(resolve, reject) {
+        offerModel.aggregate()
+            .match({
+                providerUsername: providerUsername,
+                rating: { $gte: 1 }
+            })
+            .group({
+                _id: '$rating',
+                count: { $sum: 1 }
+            })
+            .then((result) => {
                 if (result.length === 0)
-                    callback(null, 0);
+                    resolve(0);
                 else {
                     var total = 0;
                     var sum = 0;
@@ -168,10 +159,11 @@ function getAverageRating(providerUsername, callback) {
                     const oneDecimalPlace = 10;
                     var average = Math.round((sum / total) * oneDecimalPlace) / oneDecimalPlace;
 
-                    callback(null, average);
+                    resolve(average);
                 }
-            }
-        });
+            })
+            .catch(err => reject(err));
+    });
 }
 
 module.exports = AuthController;

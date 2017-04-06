@@ -1,7 +1,6 @@
 const express = require('express'),
     bodyparser = require('body-parser'),
     mongoose = require('mongoose'),
-    passport = require('passport'),
     AuthController = require('./controllers/auth.controller'),
     dbConfig = require('./config/db.config'),
     orderApi = require('./api/order.api'),
@@ -10,12 +9,12 @@ const express = require('express'),
 
 var app = express();
 
-var auth = new AuthController(passport);
-
-auth.setup(app);
+var auth = new AuthController();
 
 app.use(bodyparser.json());
 app.use(bodyparser.urlencoded({ extended: true }));
+
+auth.setup(app);
 
 var port = process.env.PORT || 3000;
 
@@ -23,7 +22,7 @@ orderApi(app);
 offerApi(app);
 authAPi(app, auth);
 //TODO: USE bluebird!! SAVE YOURSELF FROM CALLBACK HELL!!
-mongoose.Promise = /*require('bluebird')*/ global.Promise;
+mongoose.Promise = require('bluebird') /*global.Promise*/ ;
 
 mongoose.connect(dbConfig());
 
