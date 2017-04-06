@@ -127,7 +127,7 @@ AuthController.prototype.getInformation = function(providerUsername) {
                 information.average = average;
                 resolve(information);
             })
-            .catch(err => reject(err));
+            .catch((err) => reject(err));
 
     });
 }
