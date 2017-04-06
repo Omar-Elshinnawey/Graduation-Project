@@ -7,512 +7,460 @@ const PaymentInterface = require('../externals/payment'),
     OFFER_STATE = require('../constants/offer-state.constant'),
     ORDER_STATE = require('../constants/order-state.constant'),
     REFUND_TYPE = require('../constants/refund.constant'),
-    Validator = require('../controllers/validator.controller');
+    Validator = require('../controllers/validator.controller'),
+    Promise = require('bluebird');
 
 function OfferController() {
     this.validator = new Validator();
 }
 
-OfferController.prototype.createOffer = function(providerUsername, orderId, price, description, callback) {
+OfferController.prototype.createOffer = function(providerUsername, orderId, price, description) {
 
-    if (!this.validator.validateEmptyOrWhiteSpace(providerUsername)) {
+    var _self = this;
 
-        callback(ERRORS.OFFER.USERNAME_MISSING, 'error');
-        return;
-
-    }
-
-    if (!this.validator.validateEmptyOrWhiteSpace(orderId)) {
-
-        callback(ERRORS.OFFER.ORDERID_MISSING, 'error');
-        return;
-    }
-
-    if (!this.validator.validateEmptyOrWhiteSpace(price) || isNaN(price) || price < 0) {
-
-        callback(ERRORS.OFFER.INVALID_PRICE, 'error');
-        return;
-
-    }
-
-    if (!this.validator.validateEmptyOrWhiteSpace(description)) {
-
-        callback(ERRORS.OFFER.DESCRIPTION_MISSING, 'error');
-        return;
-
-    }
-
-    orderModel.count({
-            _id: orderId,
-            state: ORDER_STATE.ACTIVE
-        },
-        function(err, count) {
-
-            if (count === 0 || err)
-
-                callback(ERRORS.OFFER.ORDER_DOESNOT_EXIST, 'error');
-
-            else {
-
-                var offer = offerModel({
-
-                    providerUsername: providerUsername,
-                    orderId: orderId,
-                    price: price,
-                    description: description,
-                    state: OFFER_STATE.ACTIVE
-
-                });
-
-                offer.save(function(err) {
-
-                    if (err)
-                        callback(err, 'fail');
-                    else
-                        callback(null, 'Success');
-
-                });
-            }
-        });
-}
-
-//this is for providers to get thier own offers.
-OfferController.prototype.getOffersForProvider = function(providerUsername, callback) {
-
-    if (!this.validator.validateEmptyOrWhiteSpace(providerUsername)) {
-
-        callback(ERRORS.OFFER.USERNAME_MISSING, 'error');
-        return;
-
-    }
-
-    offerModel.find({
-            providerUsername: providerUsername
-        },
-        'providerUsername price _id',
-        function(err, result) {
-
-            if (err)
-                callback(err, 'error');
-            else
-                callback(null, result);
-
-        });
-}
-
-//this is for customers to get offers for thier own order.
-OfferController.prototype.getOffersForOrder = function(customerUsername, orderId, callback) {
-
-    if (!this.validator.validateEmptyOrWhiteSpace(customerUsername)) {
-
-        callback(ERRORS.OFFER.USERNAME_MISSING, 'error');
-        return;
-
-    }
-
-    if (!this.validator.validateEmptyOrWhiteSpace(orderId)) {
-
-        callback(ERRORS.OFFER.ORDERID_MISSING, 'error');
-        return;
-
-    }
-
-    orderModel.count({
-            _id: orderId
-        },
-        function(err, count) {
-
-            if (count === 0 || err)
-
-                callback(ERRORS.OFFER.ORDER_DOESNOT_EXIST, 'error');
-
-            else {
-
-                offerModel.find({
-                        orderId: orderId
-                    },
-                    'providerUsername price state _id',
-                    function(error, result) {
-
-                        if (error)
-                            callback(error, 'error');
-                        else
-                            callback(null, result);
-
-                    });
-            }
-        });
-}
-
-OfferController.prototype.getOfferDetails = function(offerId, callback) {
-
-    if (!this.validator.validateEmptyOrWhiteSpace(offerId)) {
-
-        callback(ERRORS.OFFER.OFFERID_MISSING, 'error');
-        return;
-    }
-
-    offerModel.findById(offerId)
-        .populate('orderId', 'customerUsername')
-        .exec(function(err, result) {
-
-            if (err)
-                callback(err, 'fail');
-            else
-                callback(null, result);
-        });
-}
-
-OfferController.prototype.deleteOffer = function(providerUsername, offerId, callback) {
-
-    if (!this.validator.validateEmptyOrWhiteSpace(providerUsername)) {
-
-        callback(ERRORS.OFFER.USERNAME_MISSING, 'error');
-        return;
-
-    }
-
-    if (!this.validator.validateEmptyOrWhiteSpace(offerId)) {
-
-        callback(ERRORS.OFFER.OFFERID_MISSING, 'error');
-        return;
-
-    }
-
-    offerModel.findOneAndRemove({
-            _id: offerId,
-            providerUsername: providerUsername,
-            state: OFFER_STATE.ACTIVE
-        },
-        function(err, result) {
-
-            if (err)
-                callback(err, 'error');
-            else
-                callback(null, result);
-
-        });
-}
-
-OfferController.prototype.updateOffer = function(providerUsername, offerId, description, price, callback) {
-
-    var offerToBeUpdated = {};
-
-    if (!this.validator.validateEmptyOrWhiteSpace(providerUsername)) {
-        callback(ERRORS.OFFER.USERNAME_MISSING, 'error');
-        return;
-    }
-
-    if (!this.validator.validateEmptyOrWhiteSpace(offerId)) {
-        callback(ERRORS.OFFER.OFFERID_MISSING, 'error');
-        return;
-    }
-
-    if (this.validator.validateEmptyOrWhiteSpace(price) && (price < 0 || isNaN(price))) {
-
-        callback(ERRORS.OFFER.INVALID_PRICE, 'error');
-        return;
-
-    }
-
-    if (this.validator.validateEmptyOrWhiteSpace(price)) {
-        offerToBeUpdated.price = price;
-    }
-
-    if (this.validator.validateEmptyOrWhiteSpace(description)) {
-        offerToBeUpdated.description = description;
-    }
-
-    offerModel.findOneAndUpdate({
-            providerUsername: providerUsername,
-            _id: offerId,
-            state: OFFER_STATE.ACTIVE
-        },
-        offerToBeUpdated,
-        function(err, result) {
-
-            if (err)
-                callback(err, 'failed');
-            else
-                callback(null, 'updated');
-
-        });
-}
-
-OfferController.prototype.acceptOffer = function(customerUsername, offerId, paymentObject, callback) {
-
-    if (!this.validator.validateEmptyOrWhiteSpace(customerUsername)) {
-
-        callback(ERRORS.OFFER.USERNAME_MISSING, 'error');
-        return;
-
-    }
-
-    if (!this.validator.validateEmptyOrWhiteSpace(offerId)) {
-
-        callback(ERRORS.OFFER.OFFERID_MISSING, 'error');
-        return;
-
-    }
-
-    if (!paymentObject ||
-        !this.validator.validateEmptyOrWhiteSpace(paymentObject.amount) ||
-        !this.validator.validateEmptyOrWhiteSpace(paymentObject.emonth) ||
-        !this.validator.validateEmptyOrWhiteSpace(paymentObject.eyear) ||
-        !this.validator.validateEmptyOrWhiteSpace(paymentObject.cvc) ||
-        !this.validator.validateEmptyOrWhiteSpace(paymentObject.number)) {
-
-        callback(ERRORS.OFFER.INVALID_PAYMENT_INFO, 'fail');
-        return;
-
-    }
-
-    offerModel.findOne({ _id: offerId })
-        .populate('orderId', 'customerUsername')
-        .exec(
-            function(err, result) {
-
-                if (err)
-                    callback(err, 'fail');
-
-                else {
-
-                    if (result.orderId[0].customerUsername !== customerUsername)
-                        callback(ERRORS.OFFER.ORDER_DOESNOT_EXIST, 'fail');
-
-                    else {
-
-                        switch (result.state) {
-
-                            case OFFER_STATE.ACCEPTED:
-                                callback(ERRORS.OFFER.OFFER_ALREADY_ACCEPTED, 'fail');
-                                break;
-
-                            case OFFER_STATE.CLOSED:
-                                callback(ERRORS.OFFER.OFFER_CLOSED, 'fail');
-                                break;
-
-                            default:
-                                PaymentInterface.makePayment(paymentObject, function(err, data) {
-
-                                    if (err) {
-                                        callback(errData.data.error.message, 'fail');
-                                    } else {
-                                        orderModel.findByIdAndUpdate(
-                                            result.orderId[0]._id, { state: ORDER_STATE.CLOSED },
-                                            function(err, result) {}
-                                        );
-
-                                        offerModel.update({
-                                                orderId: result.orderId,
-                                                _id: { "$ne": result._id }
-                                            }, { state: OFFER_STATE.CLOSED }, { multi: true },
-                                            function(err, result) {});
-
-                                        result.state = OFFER_STATE.ACCEPTED;
-                                        result.save();
-
-                                        payment = paymentModel({
-                                            orderId: result.orderId[0]._id,
-                                            offerId: result._id,
-                                            date: Date.now(),
-                                            paymentId: data.id
-                                        });
-
-                                        payment.save();
-
-                                        callback(null, 'accepted');
-                                    }
-                                });
-                        }
-                    }
-                }
-            });
-}
-
-OfferController.prototype.rateOffer = function(customerUsername, offerId, review, rating, callback) {
-
-    if (!this.validator.validateEmptyOrWhiteSpace(customerUsername)) {
-
-        callback(ERRORS.OFFER.USERNAME_MISSING, 'fail');
-        return;
-    }
-
-    if (!this.validator.validateEmptyOrWhiteSpace(offerId)) {
-
-        callback(ERRORS.OFFER.OFFERID_MISSING, 'fail');
-        return;
-    }
-
-    if (!this.validator.validateEmptyOrWhiteSpace(rating) || rating < 1 || rating > 5) {
-
-        callback(ERRORS.OFFER.INVALID_RATING, 'fail');
-        return;
-    }
-
-    offerModel.findOne({ _id: offerId })
-        .populate('orderId', 'customerUsername')
-        .exec(
-            function(err, result) {
-
-                if (err)
-                    callback(err, 'fail');
-
-                else {
-
-                    if (result.state === OFFER_STATE.DELIVERED) {
-
-                        if (result.orderId[0].customerUsername !== customerUsername)
-                            callback(ERRORS.OFFER.ORDER_DOESNOT_EXIST, 'fail');
-
-                        else {
-
-                            result.rating = rating;
-                            result.review = review;
-
-                            result.save(function(error, doc, nbAffected) {
-
-                                if (nbAffected === 1)
-                                    callback(null, 'success');
-                                else
-                                    callback(ERRORS.UNKOWN, 'fail');
-
-                            });
-                        }
-                    } else
-                        callback(ERRORS.OFFER.INVALID_RATING, 'fail');
-                }
-            });
-}
-
-//Kind of useless? verify with team -> get offer details do this.
-OfferController.prototype.getRating = function(providerUsername, offerId, callback) {
-
-    if (!this.validator.validateEmptyOrWhiteSpace(providerUsername)) {
-        callback(ERRORS.OFFER.USERNAME_MISSING, 'fail');
-        return;
-    }
-
-    if (!this.validator.validateEmptyOrWhiteSpace(offerId)) {
-        callback(ERRORS.OFFER.OFFERID_MISSING, 'fail');
-        return;
-    }
-
-    offerModel.findOne({
-        _id: offerId,
-        providerUsername: providerUsername
-    }, function(err, result) {
-
-        if (err || !result || result.length === 0)
-            callback(ERRORS.OFFER.OFFER_DOESNOT_EXIST, 'fail');
-        else {
-            if (!result.rating && !result.review)
-                callback(ERRORS.OFFER.NO_RATING, 'fail');
-            else {
-                var rating = {};
-
-                rating.stars = result.rating;
-                rating.review = result.review;
-
-                callback(null, rating);
-            }
+    return new Promise(function(resolve, reject) {
+        if (!_self.validator.validateEmptyOrWhiteSpace(providerUsername)) {
+            reject(ERRORS.OFFER.USERNAME_MISSING);
+            return;
         }
+
+        if (!_self.validator.validateEmptyOrWhiteSpace(orderId)) {
+            reject(ERRORS.OFFER.ORDERID_MISSING);
+            return;
+        }
+
+        if (!_self.validator.validateEmptyOrWhiteSpace(price) || isNaN(price) || price < 0) {
+            reject(ERRORS.OFFER.INVALID_PRICE);
+            return;
+        }
+
+        if (!_self.validator.validateEmptyOrWhiteSpace(description)) {
+            reject(ERRORS.OFFER.DESCRIPTION_MISSING);
+            return;
+        }
+
+        orderModel.count({
+                _id: orderId,
+                state: ORDER_STATE.ACTIVE
+            })
+            .then((count) => {
+                if (count === 0)
+                    reject(ERRORS.OFFER.ORDER_DOESNOT_EXIST);
+                else {
+                    return offerModel.count({
+                        orderId: orderId,
+                        providerUsername: providerUsername
+                    })
+                }
+            })
+            .then((count) => {
+
+                if (count > 0) {
+                    reject(ERRORS.OFFER.DUPLICATE_OFFER);
+                } else {
+                    var offer = offerModel({
+                        providerUsername: providerUsername,
+                        orderId: orderId,
+                        price: price,
+                        description: description,
+                        state: OFFER_STATE.ACTIVE
+                    });
+
+                    offer.save()
+                        .then(resolve('Success'));
+                }
+            })
+            .catch((err) => reject(err));
     });
 }
 
-OfferController.prototype.submitForDelivary = function(providerUsername, offerId, callback) {
+//this is for providers to get thier own offers.
+OfferController.prototype.getOffersForProvider = function(providerUsername) {
 
-    if (!this.validator.validateEmptyOrWhiteSpace(providerUsername)) {
+    var _self = this;
 
-        callback(ERRORS.OFFER.USERNAME_MISSING, 'fail');
-        return;
-    }
+    return new Promise(function(resolve, reject) {
 
-    if (!this.validator.validateEmptyOrWhiteSpace(offerId)) {
+        if (!_self.validator.validateEmptyOrWhiteSpace(providerUsername)) {
+            reject(ERRORS.OFFER.USERNAME_MISSING);
+            return;
+        }
 
-        callback(ERRORS.OFFER.OFFERID_MISSING, 'fail');
-        return;
-    }
-
-    offerModel.findById(offerId)
-        .exec(function(err, result) {
-
-            if (err)
-                callback(err, 'fail');
-            else
-
-            if (providerUsername !== result.providerUsername)
-                callback(ERRORS.AUTH.NOT_AUTHERIZED, 'fail');
-            else
-            if (result.state !== OFFER_STATE.ACCEPTED)
-                callback(ERRORS.OFFER.INVALID_DELIVERY, 'fail');
-            else {
-
-                result.state = OFFER_STATE.ON_ROUTE;
-
-                result.save(function(error, doc, numAffected) {
-
-                    if (error)
-                        callback(error, 'fail');
-                    else if (numAffected === 1)
-                        callback(null, 'success');
-                    else callback(ERRORS.UNKOWN, 'fail');
-                });
-            }
-        });
+        offerModel.find({
+                    providerUsername: providerUsername
+                },
+                'providerUsername price _id')
+            .then((result) => resolve(result))
+            .catch((err) => reject(err));
+    });
 }
 
-OfferController.prototype.requestRefund = function(customerUsername, offerId, type, reason, callback) {
-    if (!this.validator.validateEmptyOrWhiteSpace(customerUsername)) {
-        callback(ERRORS.OFFER.USERNAME_MISSING, 'fail');
-        return;
-    }
+//this is for customers to get offers for thier own order.
+OfferController.prototype.getOffersForOrder = function(customerUsername, orderId) {
 
-    if (!this.validator.validateEmptyOrWhiteSpace(offerId)) {
-        callback(ERRORS.OFFER.OFFERID_MISSING, 'fail');
-        return;
-    }
+    var _self = this;
 
-    if (!this.validator.validateEmptyOrWhiteSpace(reason)) {
-        callback(ERRORS.OFFER.REFUND_REASON_MISSING, 'fail');
-        return;
-    }
+    return new Promise(function(resolve, reject) {
 
-    refundModel.count({
-            offerId: offerId
-        },
-        function(err, count) {
+        if (!_self.validator.validateEmptyOrWhiteSpace(customerUsername)) {
+            reject(ERRORS.OFFER.USERNAME_MISSING);
+            return;
+        }
 
-            if (err || count >= 1)
-                callback(ERRORS.OFFER.ALREADY_REQUESTED_REFUND, 'fail');
-            else {
-                offerModel.findOne({
-                        _id: offerId,
-                        state: OFFER_STATE.DELIVERED
-                    })
-                    .populate('orderId', 'customerUsername')
-                    .exec(function(err, result) {
-                        if (err || !result || result.length < 1 || result.orderId[0].customerUsername !== customerUsername)
-                            callback(ERRORS.OFFER.ORDER_DOESNOT_EXIST, 'fail');
-                        else {
-                            var refundRequest = refundModel({
-                                offerId: offerId,
-                                type: type,
-                                reason: reason,
-                                data: Date.now()
-                            });
+        if (!_self.validator.validateEmptyOrWhiteSpace(orderId)) {
+            reject(ERRORS.OFFER.ORDERID_MISSING);
+            return;
+        }
 
-                            refundRequest.save(function(err) {
-                                if (err)
-                                    callback(err, 'fail');
-                                else
-                                    callback(null, 'Success');
-                            });
+        orderModel.count({ _id: orderId })
+            .then((count) => {
+                if (count === 0)
+                    reject(ERRORS.OFFER.ORDER_DOESNOT_EXIST);
+                else {
+                    offerModel.find({
+                                orderId: orderId
+                            },
+                            'providerUsername price state _id')
+                        .then((result) => resolve(result))
+                }
+            })
+            .catch((err) => reject(err));
+    });
+}
 
-                        }
-                    });
-            }
-        });
+OfferController.prototype.getOfferDetails = function(offerId) {
+
+    var _self = this;
+
+    return new Promise(function(resolve, reject) {
+
+        if (!_self.validator.validateEmptyOrWhiteSpace(offerId)) {
+            callback(ERRORS.OFFER.OFFERID_MISSING, 'error');
+            return;
+        }
+
+        offerModel.findById(offerId)
+            .populate('orderId', 'customerUsername')
+            .then((result) => resolve(result))
+            .catch((err) => reject(err));
+
+    });
+}
+
+OfferController.prototype.deleteOffer = function(providerUsername, offerId) {
+
+    var _self = this;
+
+    return new Promise(function(resolve, reject) {
+
+        if (!_self.validator.validateEmptyOrWhiteSpace(providerUsername)) {
+            reject(ERRORS.OFFER.USERNAME_MISSING);
+            return;
+        }
+
+        if (!_self.validator.validateEmptyOrWhiteSpace(offerId)) {
+            reject(ERRORS.OFFER.OFFERID_MISSING);
+            return;
+        }
+
+        offerModel.findOneAndRemove({
+                _id: offerId,
+                providerUsername: providerUsername,
+                state: OFFER_STATE.ACTIVE
+            })
+            .then(resolve('Success'))
+            .catch((err) => reject(err));
+    });
+}
+
+OfferController.prototype.updateOffer = function(providerUsername, offerId, description, price) {
+
+    var _self = this;
+
+    return new Promise(function(resolve, reject) {
+
+        var offerToBeUpdated = {};
+
+        if (!_self.validator.validateEmptyOrWhiteSpace(providerUsername)) {
+            reject(ERRORS.OFFER.USERNAME_MISSING);
+            return;
+        }
+
+        if (!_self.validator.validateEmptyOrWhiteSpace(offerId)) {
+            reject(ERRORS.OFFER.OFFERID_MISSING);
+            return;
+        }
+
+        if (_self.validator.validateEmptyOrWhiteSpace(price) && (price < 0 || isNaN(price))) {
+            reject(ERRORS.OFFER.INVALID_PRICE);
+            return;
+        }
+
+        if (_self.validator.validateEmptyOrWhiteSpace(price)) {
+            offerToBeUpdated.price = price;
+        }
+
+        if (_self.validator.validateEmptyOrWhiteSpace(description)) {
+            offerToBeUpdated.description = description;
+        }
+
+        offerModel.findOneAndUpdate({
+                    providerUsername: providerUsername,
+                    _id: offerId,
+                    state: OFFER_STATE.ACTIVE
+                },
+                offerToBeUpdated)
+            .then(resolve('Updated'))
+            .catch((err) => reject(err));
+    });
+}
+
+OfferController.prototype.acceptOffer = function(customerUsername, offerId, paymentObject) {
+
+    var _self = this;
+
+    return new Promise(function(resolve, reject) {
+
+        if (!_self.validator.validateEmptyOrWhiteSpace(customerUsername)) {
+            reject(ERRORS.OFFER.USERNAME_MISSING);
+            return;
+        }
+
+        if (!_self.validator.validateEmptyOrWhiteSpace(offerId)) {
+            reject(ERRORS.OFFER.OFFERID_MISSING);
+            return;
+        }
+
+        if (!paymentObject ||
+            !_self.validator.validateEmptyOrWhiteSpace(paymentObject.emonth) ||
+            !_self.validator.validateEmptyOrWhiteSpace(paymentObject.eyear) ||
+            !_self.validator.validateEmptyOrWhiteSpace(paymentObject.cvc) ||
+            !_self.validator.validateEmptyOrWhiteSpace(paymentObject.number)) {
+
+            reject(ERRORS.OFFER.INVALID_PAYMENT_INFO);
+            return;
+        }
+
+        offerModel.findOne({ _id: offerId })
+            .populate('orderId', 'customerUsername')
+            .then((result) => {
+
+                if (result.orderId[0].customerUsername !== customerUsername)
+                    reject(ERRORS.OFFER.ORDER_DOESNOT_EXIST);
+                else {
+
+                    switch (result.state) {
+
+                        case OFFER_STATE.ACCEPTED:
+                            reject(ERRORS.OFFER.OFFER_ALREADY_ACCEPTED);
+                            break;
+
+                        case OFFER_STATE.CLOSED:
+                            reject(ERRORS.OFFER.OFFER_CLOSED);
+                            break;
+                        default:
+                            paymentObject.amount = result.price * 100;
+                            PaymentInterface
+                                .makePayment(paymentObject)
+                                .then((data) => {
+
+                                    orderModel.findByIdAndUpdate(
+                                        result.orderId[0]._id, { state: ORDER_STATE.CLOSED }).exec();
+
+                                    offerModel.update({
+                                        orderId: result.orderId,
+                                        _id: { "$ne": result._id }
+                                    }, { state: OFFER_STATE.CLOSED }, { multi: true }).exec();
+
+                                    result.state = OFFER_STATE.ACCEPTED;
+                                    result.save();
+
+                                    payment = paymentModel({
+                                        orderId: result.orderId[0]._id,
+                                        offerId: result._id,
+                                        date: Date.now(),
+                                        paymentId: data.id
+                                    });
+
+                                    payment.save();
+
+                                    resolve('Success');
+                                });
+                    }
+                }
+            })
+            .catch((err) => reject(err));
+    });
+}
+
+OfferController.prototype.rateOffer = function(customerUsername, offerId, review, rating) {
+
+    var _self = this;
+
+    return new Promise(function(resolve, reject) {
+
+
+        if (!_self.validator.validateEmptyOrWhiteSpace(customerUsername)) {
+            reject(ERRORS.OFFER.USERNAME_MISSING);
+            return;
+        }
+
+        if (!_self.validator.validateEmptyOrWhiteSpace(offerId)) {
+            reject(ERRORS.OFFER.OFFERID_MISSING);
+            return;
+        }
+
+        if (!_self.validator.validateEmptyOrWhiteSpace(rating) || rating < 1 || rating > 5) {
+            reject(ERRORS.OFFER.INVALID_RATING);
+            return;
+        }
+
+        offerModel.findOne({ _id: offerId })
+            .populate('orderId', 'customerUsername')
+            .then((result) => {
+
+                if (result && result.length > 0 && result.state === OFFER_STATE.DELIVERED)
+                    if (result.orderId[0].customerUsername !== customerUsername)
+                        reject(ERRORS.OFFER.ORDER_DOESNOT_EXIST);
+                    else {
+
+                        result.rating = rating;
+                        result.review = review;
+
+                        result.save().then(resolve('Success'));
+                    }
+                else
+                    reject(ERRORS.OFFER.INVALID_RATING);
+            })
+            .catch((err) => reject(err));
+    });
+}
+
+//Kind of useless? verify with team -> get offer details does this.
+OfferController.prototype.getRating = function(providerUsername, offerId) {
+
+    var _self = this;
+
+    return new Promise(function(resolve, reject) {
+
+        if (!_self.validator.validateEmptyOrWhiteSpace(providerUsername)) {
+            reject(ERRORS.OFFER.USERNAME_MISSING);
+            return;
+        }
+
+        if (!_self.validator.validateEmptyOrWhiteSpace(offerId)) {
+            reject(ERRORS.OFFER.OFFERID_MISSING);
+            return;
+        }
+
+        offerModel.findOne({
+                _id: offerId,
+                providerUsername: providerUsername
+            })
+            .then((result) => {
+                if (!result || result.length === 0)
+                    reject(ERRORS.OFFER.OFFER_DOESNOT_EXIST);
+                else {
+                    if (!result.rating && !result.review)
+                        reject(ERRORS.OFFER.NO_RATING);
+                    else {
+                        var rating = {};
+
+                        rating.stars = result.rating;
+                        rating.review = result.review;
+
+                        resolve(rating);
+                    }
+                }
+            })
+    });
+}
+
+OfferController.prototype.submitForDelivary = function(providerUsername, offerId) {
+
+    var _self = this;
+
+    return new Promise(function(resolve, reject) {
+
+        if (!_self.validator.validateEmptyOrWhiteSpace(providerUsername)) {
+            reject(ERRORS.OFFER.USERNAME_MISSING);
+            return;
+        }
+
+        if (!_self.validator.validateEmptyOrWhiteSpace(offerId)) {
+            reject(ERRORS.OFFER.OFFERID_MISSING);
+            return;
+        }
+
+        offerModel.findById(offerId)
+            .then((result) => {
+                if (providerUsername !== result.providerUsername)
+                    reject(ERRORS.AUTH.NOT_AUTHERIZED);
+                else if (result.state !== OFFER_STATE.ACCEPTED)
+                    reject(ERRORS.OFFER.INVALID_DELIVERY);
+                else {
+                    result.state = OFFER_STATE.ON_ROUTE;
+
+                    result.save()
+                        .then(resolve('Success'));
+                }
+            })
+            .catch((err) => reject(err));
+    });
+}
+
+OfferController.prototype.requestRefund = function(customerUsername, offerId, type, reason) {
+
+    var _self = this;
+
+    return new Promise(function(resolve, reject) {
+
+        if (!_self.validator.validateEmptyOrWhiteSpace(customerUsername)) {
+            reject(ERRORS.OFFER.USERNAME_MISSING);
+            return;
+        }
+
+        if (!_self.validator.validateEmptyOrWhiteSpace(offerId)) {
+            reject(ERRORS.OFFER.OFFERID_MISSING);
+            return;
+        }
+
+        if (!_self.validator.validateEmptyOrWhiteSpace(reason)) {
+            reject(ERRORS.OFFER.REFUND_REASON_MISSING);
+            return;
+        }
+
+        refundModel.count({ offerId: offerId })
+            .then((count) => {
+                if (count >= 1)
+                    reject(ERRORS.OFFER.ALREADY_REQUESTED_REFUND);
+                else {
+                    offerModel.findOne({
+                            _id: offerId,
+                            state: OFFER_STATE.DELIVERED
+                        })
+                        .populate('orderId', 'customerUsername')
+                        .then((result) => {
+                            if (!result || result.length < 1 || result.orderId[0].customerUsername !== customerUsername)
+                                reject(ERRORS.OFFER.OFFER_DOESNOT_EXIST);
+                            else {
+
+                                var refundRequest = refundModel({
+                                    offerId: offerId,
+                                    type: type,
+                                    reason: reason,
+                                    data: Date.now()
+                                });
+
+                                refundRequest.save();
+
+                                resolve('Success');
+                            }
+                        });
+                }
+            })
+            .catch((err) => reject(err));
+    });
 }
 
 module.exports = OfferController;

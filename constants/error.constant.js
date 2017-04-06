@@ -36,6 +36,11 @@ module.exports = Object.freeze({
             message: "Offer id is required"
         },
 
+        DUPLICATE_OFFER: {
+            code: "Offer/duplicate offer",
+            message: "Cannot make two offers for the same order"
+        },
+
         OFFER_ALREADY_ACCEPTED: {
             code: "Offer/already accepted",
             message: "The selected offer was previously accepted"
