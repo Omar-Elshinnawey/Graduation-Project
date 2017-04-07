@@ -126,4 +126,11 @@ module.exports = function offerRouter(app) {
             .then((result) => res.send(result))
             .catch((err) => res.send(err));
     });
+
+    app.get('/top/:category', function(req, res) {
+
+        offerController.getTopProviders(req.params.category)
+            .then((resule) => res.send(resule))
+            .catch((err) => res.send(err));
+    });
 }

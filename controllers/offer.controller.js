@@ -7,6 +7,7 @@ const PaymentInterface = require('../externals/payment'),
     OFFER_STATE = require('../constants/offer-state.constant'),
     ORDER_STATE = require('../constants/order-state.constant'),
     REFUND_TYPE = require('../constants/refund.constant'),
+    CATEGORIES = require('../constants/category.constant'),
     Validator = require('../controllers/validator.controller'),
     Promise = require('bluebird');
 
@@ -373,6 +374,7 @@ OfferController.prototype.getRating = function(providerUsername, offerId) {
                     }
                 }
             })
+            .catch((err) => reject(err));
     });
 }
 
@@ -459,6 +461,55 @@ OfferController.prototype.requestRefund = function(customerUsername, offerId, ty
                         });
                 }
             })
+            .catch((err) => reject(err));
+    });
+}
+
+OfferController.prototype.getTopProviders = function(category) {
+
+    var _self = this;
+
+    return new Promise(function(resolve, reject) {
+
+        if (!_self.validator.validateEmptyOrWhiteSpace(category) || !_self.validator.findValue(CATEGORIES, category)) {
+            reject(ERRORS.OFFER.CATEGORY_REQUIRED);
+            return
+        }
+
+        offerModel.aggregate()
+            .unwind('orderId')
+            .lookup({
+                from: orderModel.collection.name,
+                localField: 'orderId',
+                foreignField: '_id',
+                as: 'order'
+            })
+            .unwind('order')
+            .group({
+                _id: '$_id',
+                providerUsername: { '$first': '$providerUsername' },
+                rating: { '$first': '$rating' },
+                category: { '$first': '$order.Category' }
+            })
+            .match({ rating: { $gte: 1 }, category: { $eq: Number(category) } })
+            .group({
+                _id: {
+                    providerUsername: '$providerUsername',
+                    rating: '$rating'
+                },
+                total: { $sum: 1 }
+            })
+            .group({
+                _id: '$_id.providerUsername',
+                total: { $sum: { $multiply: ['$_id.rating', '$total'] } },
+                all: { $sum: '$total' }
+            })
+            .project({
+                'total': { $divide: ['$total', '$all'] }
+            })
+            .sort({ total: -1 })
+            .limit(5)
+            .then((result) => resolve(result))
             .catch((err) => reject(err));
     });
 }

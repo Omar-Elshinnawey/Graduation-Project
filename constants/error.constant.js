@@ -36,6 +36,11 @@ module.exports = Object.freeze({
             message: "Offer id is required"
         },
 
+        CATEGORY_REQUIRED: {
+            code: "Offer/missing or invalid category",
+            message: "Category is missing or invalid"
+        },
+
         DUPLICATE_OFFER: {
             code: "Offer/duplicate offer",
             message: "Cannot make two offers for the same order"

@@ -162,7 +162,7 @@ function getAverageRating(providerUsername) {
                     resolve(average);
                 }
             })
-            .catch(err => reject(err));
+            .catch((err) => reject(err));
     });
 }
 
