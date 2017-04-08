@@ -15,6 +15,8 @@ function OfferController() {
     this.validator = new Validator();
 }
 
+//for providers==============================================================================
+
 OfferController.prototype.createOffer = function(providerUsername, orderId, price, description) {
 
     var _self = this;
@@ -75,7 +77,6 @@ OfferController.prototype.createOffer = function(providerUsername, orderId, pric
     });
 }
 
-//this is for providers to get thier own offers.
 OfferController.prototype.getOffersForProvider = function(providerUsername) {
 
     var _self = this;
@@ -93,58 +94,6 @@ OfferController.prototype.getOffersForProvider = function(providerUsername) {
                 'providerUsername price _id')
             .then((result) => resolve(result))
             .catch((err) => reject(err));
-    });
-}
-
-//this is for customers to get offers for thier own order.
-OfferController.prototype.getOffersForOrder = function(customerUsername, orderId) {
-
-    var _self = this;
-
-    return new Promise(function(resolve, reject) {
-
-        if (!_self.validator.validateEmptyOrWhiteSpace(customerUsername)) {
-            reject(ERRORS.OFFER.USERNAME_MISSING);
-            return;
-        }
-
-        if (!_self.validator.validateEmptyOrWhiteSpace(orderId)) {
-            reject(ERRORS.OFFER.ORDERID_MISSING);
-            return;
-        }
-
-        orderModel.count({ _id: orderId })
-            .then((count) => {
-                if (count === 0)
-                    reject(ERRORS.OFFER.ORDER_DOESNOT_EXIST);
-                else {
-                    offerModel.find({
-                                orderId: orderId
-                            },
-                            'providerUsername price state _id')
-                        .then((result) => resolve(result))
-                }
-            })
-            .catch((err) => reject(err));
-    });
-}
-
-OfferController.prototype.getOfferDetails = function(offerId) {
-
-    var _self = this;
-
-    return new Promise(function(resolve, reject) {
-
-        if (!_self.validator.validateEmptyOrWhiteSpace(offerId)) {
-            reject(ERRORS.OFFER.OFFERID_MISSING);
-            return;
-        }
-
-        offerModel.findById(offerId)
-            .populate('orderId', 'customerUsername')
-            .then((result) => resolve(result))
-            .catch((err) => reject(err));
-
     });
 }
 
@@ -212,6 +161,113 @@ OfferController.prototype.updateOffer = function(providerUsername, offerId, desc
                 },
                 offerToBeUpdated)
             .then(resolve('Updated'))
+            .catch((err) => reject(err));
+    });
+}
+
+//Kind of useless? verify with team -> get offer details does this.
+OfferController.prototype.getRating = function(providerUsername, offerId) {
+
+    var _self = this;
+
+    return new Promise(function(resolve, reject) {
+
+        if (!_self.validator.validateEmptyOrWhiteSpace(providerUsername)) {
+            reject(ERRORS.OFFER.USERNAME_MISSING);
+            return;
+        }
+
+        if (!_self.validator.validateEmptyOrWhiteSpace(offerId)) {
+            reject(ERRORS.OFFER.OFFERID_MISSING);
+            return;
+        }
+
+        offerModel.findOne({
+                _id: offerId,
+                providerUsername: providerUsername
+            })
+            .then((result) => {
+                if (!result || result.length === 0)
+                    reject(ERRORS.OFFER.OFFER_DOESNOT_EXIST);
+                else {
+                    if (!result.rating && !result.review)
+                        reject(ERRORS.OFFER.NO_RATING);
+                    else {
+                        var rating = {};
+
+                        rating.stars = result.rating;
+                        rating.review = result.review;
+
+                        resolve(rating);
+                    }
+                }
+            })
+            .catch((err) => reject(err));
+    });
+}
+
+OfferController.prototype.submitForDelivary = function(providerUsername, offerId) {
+
+    var _self = this;
+
+    return new Promise(function(resolve, reject) {
+
+        if (!_self.validator.validateEmptyOrWhiteSpace(providerUsername)) {
+            reject(ERRORS.OFFER.USERNAME_MISSING);
+            return;
+        }
+
+        if (!_self.validator.validateEmptyOrWhiteSpace(offerId)) {
+            reject(ERRORS.OFFER.OFFERID_MISSING);
+            return;
+        }
+
+        offerModel.findById(offerId)
+            .then((result) => {
+                if (providerUsername !== result.providerUsername)
+                    reject(ERRORS.AUTH.NOT_AUTHERIZED);
+                else if (result.state !== OFFER_STATE.ACCEPTED)
+                    reject(ERRORS.OFFER.INVALID_DELIVERY);
+                else {
+                    result.state = OFFER_STATE.ON_ROUTE;
+
+                    result.save()
+                        .then(resolve('Success'));
+                }
+            })
+            .catch((err) => reject(err));
+    });
+}
+
+//for customers=========================================================================
+OfferController.prototype.getOffersForOrder = function(customerUsername, orderId) {
+
+    var _self = this;
+
+    return new Promise(function(resolve, reject) {
+
+        if (!_self.validator.validateEmptyOrWhiteSpace(customerUsername)) {
+            reject(ERRORS.OFFER.USERNAME_MISSING);
+            return;
+        }
+
+        if (!_self.validator.validateEmptyOrWhiteSpace(orderId)) {
+            reject(ERRORS.OFFER.ORDERID_MISSING);
+            return;
+        }
+
+        orderModel.count({ _id: orderId, customerUsername: customerUsername })
+            .then((count) => {
+                if (count === 0)
+                    reject(ERRORS.OFFER.ORDER_DOESNOT_EXIST);
+                else {
+                    offerModel.find({
+                                orderId: orderId
+                            },
+                            'providerUsername price state _id')
+                        .then((result) => resolve(result))
+                }
+            })
             .catch((err) => reject(err));
     });
 }
@@ -337,80 +393,6 @@ OfferController.prototype.rateOffer = function(customerUsername, offerId, review
     });
 }
 
-//Kind of useless? verify with team -> get offer details does this.
-OfferController.prototype.getRating = function(providerUsername, offerId) {
-
-    var _self = this;
-
-    return new Promise(function(resolve, reject) {
-
-        if (!_self.validator.validateEmptyOrWhiteSpace(providerUsername)) {
-            reject(ERRORS.OFFER.USERNAME_MISSING);
-            return;
-        }
-
-        if (!_self.validator.validateEmptyOrWhiteSpace(offerId)) {
-            reject(ERRORS.OFFER.OFFERID_MISSING);
-            return;
-        }
-
-        offerModel.findOne({
-                _id: offerId,
-                providerUsername: providerUsername
-            })
-            .then((result) => {
-                if (!result || result.length === 0)
-                    reject(ERRORS.OFFER.OFFER_DOESNOT_EXIST);
-                else {
-                    if (!result.rating && !result.review)
-                        reject(ERRORS.OFFER.NO_RATING);
-                    else {
-                        var rating = {};
-
-                        rating.stars = result.rating;
-                        rating.review = result.review;
-
-                        resolve(rating);
-                    }
-                }
-            })
-            .catch((err) => reject(err));
-    });
-}
-
-OfferController.prototype.submitForDelivary = function(providerUsername, offerId) {
-
-    var _self = this;
-
-    return new Promise(function(resolve, reject) {
-
-        if (!_self.validator.validateEmptyOrWhiteSpace(providerUsername)) {
-            reject(ERRORS.OFFER.USERNAME_MISSING);
-            return;
-        }
-
-        if (!_self.validator.validateEmptyOrWhiteSpace(offerId)) {
-            reject(ERRORS.OFFER.OFFERID_MISSING);
-            return;
-        }
-
-        offerModel.findById(offerId)
-            .then((result) => {
-                if (providerUsername !== result.providerUsername)
-                    reject(ERRORS.AUTH.NOT_AUTHERIZED);
-                else if (result.state !== OFFER_STATE.ACCEPTED)
-                    reject(ERRORS.OFFER.INVALID_DELIVERY);
-                else {
-                    result.state = OFFER_STATE.ON_ROUTE;
-
-                    result.save()
-                        .then(resolve('Success'));
-                }
-            })
-            .catch((err) => reject(err));
-    });
-}
-
 OfferController.prototype.requestRefund = function(customerUsername, offerId, type, reason) {
 
     var _self = this;
@@ -462,6 +444,69 @@ OfferController.prototype.requestRefund = function(customerUsername, offerId, ty
                 }
             })
             .catch((err) => reject(err));
+    });
+}
+
+//for admins==============================================================================
+OfferController.prototype.adminDeleteOffer = function(offerId) {
+
+    var _self = this;
+
+    return new Promise(function(resolve, reject) {
+
+        if (!_self.validator.validateEmptyOrWhiteSpace(offerId)) {
+            reject(ERRORS.OFFER.OFFERID_MISSING);
+            return;
+        }
+
+        offerModel.findOneAndRemove({
+                _id: offerId,
+                state: OFFER_STATE.ACTIVE
+            })
+            .then(resolve('Success'))
+            .catch((err) => reject(err));
+    });
+}
+
+OfferController.prototype.adminGetOffersForOrder = function(orderId) {
+
+    var _self = this;
+
+    return new Promise(function(resolve, reject) {
+
+        if (!_self.validator.validateEmptyOrWhiteSpace(orderId)) {
+            reject(ERRORS.OFFER.ORDERID_MISSING);
+            return;
+        }
+
+        offerModel.find({
+                    orderId: orderId
+                },
+                'providerUsername price state _id')
+            .then((result) => resolve(result))
+
+        .catch((err) => reject(err));
+    });
+}
+
+//for all=================================================================================
+
+OfferController.prototype.getOfferDetails = function(offerId) {
+
+    var _self = this;
+
+    return new Promise(function(resolve, reject) {
+
+        if (!_self.validator.validateEmptyOrWhiteSpace(offerId)) {
+            reject(ERRORS.OFFER.OFFERID_MISSING);
+            return;
+        }
+
+        offerModel.findById(offerId)
+            .populate('orderId', 'customerUsername')
+            .then((result) => resolve(result))
+            .catch((err) => reject(err));
+
     });
 }
 

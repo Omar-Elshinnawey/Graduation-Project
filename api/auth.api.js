@@ -1,4 +1,5 @@
-const passport = require('passport');
+const passport = require('passport'),
+    ERRORS = require('../constants/error.constant');
 module.exports = function authApi(app, authController) {
 
     app.post('/auth/register', function(req, res) {
@@ -33,7 +34,7 @@ module.exports = function authApi(app, authController) {
 
     app.get('/auth/failed', function(req, res) {
 
-        res.send(false);
+        res.send(ERRORS.AUTH.INVALID_LOGIN);
 
     });
 

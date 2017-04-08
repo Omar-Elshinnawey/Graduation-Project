@@ -5,7 +5,7 @@ var offerController = new offer();
 
 module.exports = function offerRouter(app) {
 
-    //CRUD for providers===========================================
+    //for providers===========================================
 
     app.post('/myoffers', function(req, res) {
 
@@ -118,8 +118,22 @@ module.exports = function offerRouter(app) {
             .catch((err) => res.send(err));
     });
 
-    //==================================================================
+    //for admins===============================================================
+    app.get('/offers/:orderId', function(req, res) {
 
+        offerController.adminGetOffersForOrder(req.params.orderId)
+            .then((result) => res.send(result))
+            .catch((err) => res.send(err));
+    });
+
+    app.get('/offer/delete/:offerId', function(req, res) {
+
+        offerController.adminDeleteOffer(req.params.offerId)
+            .then((resule) => res.send(resule))
+            .catch((err) => res.send(err));
+    });
+
+    //for all==================================================================
     app.get('/offer/:offerId', function(req, res) {
 
         offerController.getOfferDetails(req.params.offerId)

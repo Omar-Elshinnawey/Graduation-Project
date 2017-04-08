@@ -4,7 +4,7 @@ var orderController = new order();
 
 module.exports = function orderRouter(app) {
 
-    //CRUD for customers===========================================
+    //for customers===========================================
 
     app.post('/myorders', function(req, res) {
 
@@ -44,7 +44,7 @@ module.exports = function orderRouter(app) {
             .catch((err) => res.send(err));
     });
 
-    //providers====================================================
+    //for providers and admins============================================
 
     app.get('/orders/:Category', function(req, res) {
 
@@ -55,7 +55,16 @@ module.exports = function orderRouter(app) {
 
     });
 
-    //=============================================================
+    //for admins==========================================================
+    //get request for the browser support but it should be delete.
+    app.get('/order/delete/:orderId', function(req, res) {
+
+        orderController.adminDeleteOrder(req.params.orderId)
+            .then((result) => res.send(result))
+            .catch((err) => res.send(err));
+    });
+
+    //for all=============================================================
 
     app.get('/order/:orderId', function(req, res) {
 

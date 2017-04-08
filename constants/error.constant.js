@@ -155,6 +155,11 @@ module.exports = Object.freeze({
         PROVIDER_NOT_FOUND: {
             code: "Auth/provider not found",
             message: "No provider with the name provided"
+        },
+
+        INVALID_LOGIN: {
+            code: "Auth/invalid login",
+            message: "Wrong username or password"
         }
     },
     UNKOWN: {

@@ -9,6 +9,7 @@ function OrderController() {
     this.validator = new Validator();
 }
 
+//for customers=====================================================================================
 OrderController.prototype.createOrder = function(customerUsername, description, Category, title) {
 
     var _self = this;
@@ -49,7 +50,6 @@ OrderController.prototype.createOrder = function(customerUsername, description, 
     });
 }
 
-// this is for customers to view thier own orders.
 OrderController.prototype.getOrdersForCustomer = function(customerUsername) {
 
     var _self = this;
@@ -67,7 +67,6 @@ OrderController.prototype.getOrdersForCustomer = function(customerUsername) {
     });
 }
 
-//this is for customers to delete thier own orders.
 OrderController.prototype.deleteOrder = function(customerUsername, orderId) {
 
     var _self = this;
@@ -140,7 +139,7 @@ OrderController.prototype.updateOrder = function(customerUsername, orderId, desc
     });
 }
 
-//this is for providers to get orders in a specific category
+//for providers and admins===============================================================================
 OrderController.prototype.getOrdersInCategory = function(Category) {
 
     var _self = this;
@@ -159,6 +158,28 @@ OrderController.prototype.getOrdersInCategory = function(Category) {
     });
 }
 
+//for admins=============================================================================================
+OrderController.prototype.adminDeleteOrder = function(orderId) {
+
+    var _self = this;
+
+    return new Promise(function(resolve, reject) {
+
+        if (!_self.validator.validateEmptyOrWhiteSpace(orderId)) {
+            reject(ERRORS.ORDER.ORDERID_MISSING);
+            return;
+        }
+
+        orderModel.findOneAndRemove({
+                _id: orderId,
+                state: ORDER_STATE.ACTIVE
+            })
+            .then(resolve('Success'))
+            .catch((err) => reject(err));
+    });
+}
+
+//for all================================================================================================
 OrderController.prototype.getOrderDetails = function(orderId, callback) {
 
     var _self = this;
