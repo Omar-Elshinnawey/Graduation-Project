@@ -18,6 +18,8 @@ auth.setup(app);
 
 var port = process.env.PORT || 3000;
 
+app.use(express.static('apidoc'));
+
 orderApi(app);
 offerApi(app);
 authAPi(app, auth);
