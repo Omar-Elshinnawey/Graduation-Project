@@ -198,8 +198,8 @@ module.exports = function orderRouter(app) {
     //for all=============================================================
 
     /**
-     * @api {get} /orders/:Category Get orders in a category
-     * @apiGroup Orders
+     * @api {get} /orders/:orderId Get order details
+     * @apiGroup Order
      * @apiDescription
      * Gets details of a specified order
      * @apiParam {String} orderId The order id
