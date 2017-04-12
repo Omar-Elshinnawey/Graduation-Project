@@ -165,47 +165,6 @@ OfferController.prototype.updateOffer = function(providerUsername, offerId, desc
     });
 }
 
-//Kind of useless? verify with team -> get offer details does this.
-OfferController.prototype.getRating = function(providerUsername, offerId) {
-
-    var _self = this;
-
-    return new Promise(function(resolve, reject) {
-
-        if (!_self.validator.validateEmptyOrWhiteSpace(providerUsername)) {
-            reject(ERRORS.OFFER.USERNAME_MISSING);
-            return;
-        }
-
-        if (!_self.validator.validateEmptyOrWhiteSpace(offerId)) {
-            reject(ERRORS.OFFER.OFFERID_MISSING);
-            return;
-        }
-
-        offerModel.findOne({
-                _id: offerId,
-                providerUsername: providerUsername
-            })
-            .then((result) => {
-                if (!result || result.length === 0)
-                    reject(ERRORS.OFFER.OFFER_DOESNOT_EXIST);
-                else {
-                    if (!result.rating && !result.review)
-                        reject(ERRORS.OFFER.NO_RATING);
-                    else {
-                        var rating = {};
-
-                        rating.stars = result.rating;
-                        rating.review = result.review;
-
-                        resolve(rating);
-                    }
-                }
-            })
-            .catch((err) => reject(err));
-    });
-}
-
 OfferController.prototype.submitForDelivary = function(providerUsername, offerId) {
 
     var _self = this;

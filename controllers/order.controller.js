@@ -46,7 +46,7 @@ OrderController.prototype.createOrder = function(customerUsername, description, 
 
         order.save()
             .then(resolve('Success'))
-            .catch((err) => reject(err));
+            .catch((err) => reject(ERRORS.UNKOWN));
     });
 }
 
@@ -63,7 +63,7 @@ OrderController.prototype.getOrdersForCustomer = function(customerUsername) {
 
         orderModel.find({ customerUsername: customerUsername }, 'title _id state')
             .then((result) => resolve(result))
-            .catch((err) => reject(err));
+            .catch((err) => reject(ERRORS.UNKOWN));
     });
 }
 
@@ -89,7 +89,7 @@ OrderController.prototype.deleteOrder = function(customerUsername, orderId) {
                 state: ORDER_STATE.ACTIVE
             })
             .then(resolve('Success'))
-            .catch((err) => reject(err));
+            .catch((err) => reject(ERRORS.UNKOWN));
     });
 }
 
@@ -135,7 +135,7 @@ OrderController.prototype.updateOrder = function(customerUsername, orderId, desc
                 },
                 orderToBeUpdated)
             .then(resolve('Success'))
-            .catch((err) => reject(err));
+            .catch((err) => reject(ERRORS.UNKOWN));
     });
 }
 
@@ -154,7 +154,7 @@ OrderController.prototype.getOrdersInCategory = function(Category) {
         orderModel.find({ Category: Category },
                 'title _id state')
             .then((result) => resolve(result))
-            .catch((err) => reject(err));
+            .catch((err) => reject(ERRORS.UNKOWN));
     });
 }
 
@@ -175,7 +175,7 @@ OrderController.prototype.adminDeleteOrder = function(orderId) {
                 state: ORDER_STATE.ACTIVE
             })
             .then(resolve('Success'))
-            .catch((err) => reject(err));
+            .catch((err) => reject(ERRORS.UNKOWN));
     });
 }
 
@@ -193,7 +193,7 @@ OrderController.prototype.getOrderDetails = function(orderId, callback) {
 
         orderModel.findById(orderId)
             .then((result) => resolve(result))
-            .catch((err) => reject(err));
+            .catch((err) => reject(ERRORS.UNKOWN));
     });
 }
 

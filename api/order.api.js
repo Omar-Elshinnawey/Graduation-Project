@@ -22,9 +22,10 @@ module.exports = function orderRouter(app) {
      * @apiSuccessExample {String} Success
      *  HTTP/1.1 200 OK
      *  'Success'
-     * @apiError {String} code The error code
-     * @apiError {String} message The error message
+     * @apiError (Error 500) {String} code The error code
+     * @apiError (Error 500) {String} message The error message
      * @apiErrorExample {json} Error
+     *  HTTP/1.1 500 Internal Server Error
      *  {
      *      "code": "Order/error code",
      *      "message": "error message" 
@@ -38,7 +39,7 @@ module.exports = function orderRouter(app) {
                 req.body.Category,
                 req.body.title)
             .then((result) => res.send(result))
-            .catch((err) => res.send(err));
+            .catch((err) => res.status(500).send(err));
     });
 
     /**
@@ -56,12 +57,20 @@ module.exports = function orderRouter(app) {
      *      "title": "order title",
      *      "state": 1
      * }]
+     * @apiError (Error 500) {String} code The error code
+     * @apiError (Error 500) {String} message The error message
+     * @apiErrorExample {json} Error
+     *  HTTP/1.1 500 Internal Server Error
+     *  {
+     *      "code": "Order/error code",
+     *      "message": "error message" 
+     *  }
      */
     app.get('/myorders/:customerUsername', function(req, res) {
 
         orderController.getOrdersForCustomer(req.params.customerUsername)
             .then((result) => res.send(result))
-            .catch((err) => res.send(err));
+            .catch((err) => res.status(500).send(err));
     });
 
     /**
@@ -73,13 +82,21 @@ module.exports = function orderRouter(app) {
      * @apiSuccessExample {String} Success
      *  HTTP/1.1 200 OK
      *  'Success'
+     * @apiError (Error 500) {String} code The error code
+     * @apiError (Error 500) {String} message The error message
+     * @apiErrorExample {json} Error
+     *  HTTP/1.1 500 Internal Server Error
+     *  {
+     *      "code": "Order/error code",
+     *      "message": "error message" 
+     *  }
      */
     app.delete('/myorders/:customerUsername/:orderId', function(req, res) {
 
         orderController.deleteOrder(req.params.customerUsername,
                 req.params.orderId)
             .then((result) => res.send(result))
-            .catch((err) => res.send(err));
+            .catch((err) => res.status(500).send(err));
     });
 
     /**
@@ -94,6 +111,14 @@ module.exports = function orderRouter(app) {
      * @apiSuccessExample {String} Success
      *  HTTP/1.1 200 OK
      *  'Success'
+     * @apiError (Error 500) {String} code The error code
+     * @apiError (Error 500) {String} message The error message
+     * @apiErrorExample {json} Error
+     *  HTTP/1.1 500 Internal Server Error
+     *  {
+     *      "code": "Order/error code",
+     *      "message": "error message" 
+     *  }
      */
     app.put('/myorders', function(req, res) {
 
@@ -104,7 +129,7 @@ module.exports = function orderRouter(app) {
                 req.body.Category,
                 req.body.title)
             .then((result) => res.send(result))
-            .catch((err) => res.send(err));
+            .catch((err) => res.status(500).send(err));
     });
 
     //for providers and admins============================================
@@ -125,13 +150,21 @@ module.exports = function orderRouter(app) {
      *      "title": "order title",
      *      "state": 1
      * }]
+     * @apiError (Error 500) {String} code The error code
+     * @apiError (Error 500) {String} message The error message
+     * @apiErrorExample {json} Error
+     *  HTTP/1.1 500 Internal Server Error
+     *  {
+     *      "code": "Order/error code",
+     *      "message": "error message" 
+     *  }
      */
     app.get('/orders/:Category', function(req, res) {
 
         orderController.getOrdersInCategory(
                 req.params.Category)
             .then((result) => res.send(result))
-            .catch((err) => res.send(err));
+            .catch((err) => res.status(500).send(err));
 
     });
 
@@ -146,12 +179,20 @@ module.exports = function orderRouter(app) {
      * @apiSuccessExample {String} Success
      *  HTTP/1.1 200 OK
      *  'Success'
+     * @apiError (Error 500) {String} code The error code
+     * @apiError (Error 500) {String} message The error message
+     * @apiErrorExample {json} Error
+     *  HTTP/1.1 500 Internal Server Error
+     *  {
+     *      "code": "Order/error code",
+     *      "message": "error message" 
+     *  }
      */
     app.get('/order/delete/:orderId', function(req, res) {
 
         orderController.adminDeleteOrder(req.params.orderId)
             .then((result) => res.send(result))
-            .catch((err) => res.send(err));
+            .catch((err) => res.status(500).send(err));
     });
 
     //for all=============================================================
@@ -161,7 +202,7 @@ module.exports = function orderRouter(app) {
      * @apiGroup Orders
      * @apiDescription
      * Gets details of a specified order
-     * @apiParam {String} _id The order id
+     * @apiParam {String} orderId The order id
      * @apiSuccess {String} _id The order id
      * @apiSuccess {String} title The order's title
      * @apiSuccess {number=0,1} state The order's state
@@ -177,12 +218,20 @@ module.exports = function orderRouter(app) {
      *      "Category": 2,
      *      "description": "order description"
      * }
+     * @apiError (Error 500) {String} code The error code
+     * @apiError (Error 500) {String} message The error message
+     * @apiErrorExample {json} Error
+     *  HTTP/1.1 500 Internal Server Error
+     *  {
+     *      "code": "Order/error code",
+     *      "message": "error message" 
+     *  }
      */
     app.get('/order/:orderId', function(req, res) {
 
         orderController.getOrderDetails(req.params.orderId)
             .then((result) => res.send(result))
-            .catch((err) => res.send(err));
+            .catch((err) => res.status(500).send(err));
 
     });
 }
