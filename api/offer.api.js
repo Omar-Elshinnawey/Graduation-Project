@@ -66,7 +66,6 @@ module.exports = function offerRouter(app) {
      *  }
      */
     app.get('/myoffers/:providerUsername', function(req, res) {
-        console.log("requested");
         offerController.getOffersForProvider(
                 req.params.providerUsername)
             .then((result) => res.send(result))
