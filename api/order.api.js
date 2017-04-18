@@ -1,6 +1,11 @@
-var order = require('../controllers/order.controller');
+var order = require('../controllers/order.controller'),
+    multer = require('multer'),
+    cloudinaryStorage = require('multer-storage-cloudinary');
 
 var orderController = new order();
+var multerStorage = multer.memoryStorage();
+
+var parser = multer({ storage: multerStorage });
 
 module.exports = function orderRouter(app) {
 
@@ -18,6 +23,7 @@ module.exports = function orderRouter(app) {
      * @apiParam {String} description Description of the order
      * @apiParam {number=0,1,2,3,4} Category The category of the order
      * @apiParam {String} title The title of the order
+     * @apiParam {File} [image] An image to descripe the order
      * @apiSuccess {String} Success
      * @apiSuccessExample {String} Success
      *  HTTP/1.1 200 OK
@@ -31,13 +37,14 @@ module.exports = function orderRouter(app) {
      *      "message": "error message" 
      *  }
      */
-    app.post('/myorders', function(req, res) {
+    app.post('/myorders', parser.single('image'), function(req, res) {
 
         orderController.createOrder(
                 req.body.customerUsername,
                 req.body.description,
                 req.body.Category,
-                req.body.title)
+                req.body.title,
+                req.file)
             .then((result) => res.send(result))
             .catch((err) => res.status(500).send(err));
     });

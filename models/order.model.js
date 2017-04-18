@@ -7,7 +7,7 @@ var OrderSchema = new Schema({
     customerUsername: String,
     description: String,
     state: Number,
-    /*picture, */
+    picture: String,
     Category: Number,
     title: String
 

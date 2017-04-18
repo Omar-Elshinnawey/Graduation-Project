@@ -3,14 +3,16 @@ const orderModel = require('../models/order.model'),
     CATEGORIES = require('../constants/category.constant'),
     ERRORS = require('../constants/error.constant'),
     Validator = require('../controllers/validator.controller'),
-    Promise = require('bluebird');
+    Promise = require('bluebird'),
+    cloudinary = require('../externals/storage');
 
 function OrderController() {
     this.validator = new Validator();
+    this.storage = new cloudinary();
 }
 
 //for customers=====================================================================================
-OrderController.prototype.createOrder = function(customerUsername, description, Category, title) {
+OrderController.prototype.createOrder = function(customerUsername, description, Category, title, image) {
 
     var _self = this;
 
@@ -36,17 +38,39 @@ OrderController.prototype.createOrder = function(customerUsername, description, 
             return;
         }
 
-        var order = orderModel({
-            customerUsername: customerUsername,
-            description: description,
-            Category: Category,
-            title: title,
-            state: ORDER_STATE.ACTIVE
-        });
+        if (image) {
+            _self.storage.upload(image.buffer)
+                .then((path) => {
+                    var order = orderModel({
+                        customerUsername: customerUsername,
+                        description: description,
+                        Category: Category,
+                        title: title,
+                        state: ORDER_STATE.ACTIVE,
+                        picture: path
+                    });
 
-        order.save()
-            .then(resolve('Success'))
-            .catch((err) => reject(ERRORS.UNKOWN));
+                    order.save()
+                        .then(resolve('Success'))
+                        .catch((err) => reject(ERRORS.UNKOWN));
+                })
+                .catch((err) => reject(ERRORS.UNKOWN));
+        } else {
+
+            var order = orderModel({
+                customerUsername: customerUsername,
+                description: description,
+                Category: Category,
+                title: title,
+                state: ORDER_STATE.ACTIVE,
+            });
+
+            order.save()
+                .then(resolve('Success'))
+                .catch((err) => reject(ERRORS.UNKOWN));
+        }
+
+
     });
 }
 
