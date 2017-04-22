@@ -22,6 +22,22 @@ Payment = {
                     resolve(data);
             });
         });
+    },
+
+    refund: function(paymentId, amount) {
+        return new Promise(function(resolve, reject) {
+
+            paymentClient.refund.create({
+                amount: amount,
+                payment: paymentId
+            }, function(err, data) {
+
+                if (err)
+                    reject(err);
+                else
+                    resolve(data);
+            });
+        });
     }
 }
 

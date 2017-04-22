@@ -73,6 +73,14 @@ module.exports = Object.freeze({
             code: "Offer/refund reason missing",
             message: "You must provide a reason for the refund"
         },
+        NO_REFUND_FOUND: {
+            code: "Offer/no refund found",
+            message: "No refund found"
+        },
+        REFUNDID_MISSING: {
+            code: "Offer/refund ID missing",
+            message: "Refund ID is required"
+        },
         ALREADY_REQUESTED_REFUND: {
             code: "Offer/already requested refund",
             message: "Cannot submit multiple refund requests"

@@ -6,7 +6,8 @@ var refundSchema = new Schema({
     offerId: [{ type: Schema.Types.ObjectId, ref: 'Offer' }],
     date: Date,
     reason: String,
-    type: Number
+    type: Number,
+    state: Number
 });
 
 var Refund = mongoose.model('Refund', refundSchema);

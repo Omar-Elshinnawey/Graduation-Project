@@ -7,6 +7,7 @@ const PaymentInterface = require('../externals/payment'),
     OFFER_STATE = require('../constants/offer-state.constant'),
     ORDER_STATE = require('../constants/order-state.constant'),
     REFUND_TYPE = require('../constants/refund.constant'),
+    REFUND_STATE = require('../constants/refund-state.constant'),
     CATEGORIES = require('../constants/category.constant'),
     Validator = require('../controllers/validator.controller'),
     Promise = require('bluebird');
@@ -73,7 +74,7 @@ OfferController.prototype.createOffer = function(providerUsername, orderId, pric
                         .then(resolve('Success'));
                 }
             })
-            .catch((err) => reject(err));
+            .catch((err) => reject(ERRORS.UNKOWN));
     });
 }
 
@@ -93,7 +94,7 @@ OfferController.prototype.getOffersForProvider = function(providerUsername) {
                 },
                 'providerUsername price _id')
             .then((result) => resolve(result))
-            .catch((err) => reject(err));
+            .catch((err) => reject(ERRORS.UNKOWN));
     });
 }
 
@@ -119,7 +120,7 @@ OfferController.prototype.deleteOffer = function(providerUsername, offerId) {
                 state: OFFER_STATE.ACTIVE
             })
             .then(resolve('Success'))
-            .catch((err) => reject(err));
+            .catch((err) => reject(ERRORS.UNKOWN));
     });
 }
 
@@ -161,7 +162,7 @@ OfferController.prototype.updateOffer = function(providerUsername, offerId, desc
                 },
                 offerToBeUpdated)
             .then(resolve('Updated'))
-            .catch((err) => reject(err));
+            .catch((err) => reject(ERRORS.UNKOWN));
     });
 }
 
@@ -194,7 +195,7 @@ OfferController.prototype.submitForDelivary = function(providerUsername, offerId
                         .then(resolve('Success'));
                 }
             })
-            .catch((err) => reject(err));
+            .catch((err) => reject(ERRORS.UNKOWN));
     });
 }
 
@@ -305,7 +306,7 @@ OfferController.prototype.acceptOffer = function(customerUsername, offerId, paym
                     }
                 }
             })
-            .catch((err) => reject(err));
+            .catch((err) => reject(ERRORS.UNKOWN));
     });
 }
 
@@ -348,7 +349,7 @@ OfferController.prototype.rateOffer = function(customerUsername, offerId, review
                 else
                     reject(ERRORS.OFFER.INVALID_RATING);
             })
-            .catch((err) => reject(err));
+            .catch((err) => reject(ERRORS.UNKOWN));
     });
 }
 
@@ -392,7 +393,8 @@ OfferController.prototype.requestRefund = function(customerUsername, offerId, ty
                                     offerId: offerId,
                                     type: type,
                                     reason: reason,
-                                    data: Date.now()
+                                    date: Date.now(),
+                                    state: REFUND_STATE.ACTIVE
                                 });
 
                                 refundRequest.save();
@@ -402,7 +404,7 @@ OfferController.prototype.requestRefund = function(customerUsername, offerId, ty
                         });
                 }
             })
-            .catch((err) => reject(err));
+            .catch((err) => reject(ERRORS.UNKOWN));
     });
 }
 
@@ -423,7 +425,7 @@ OfferController.prototype.adminDeleteOffer = function(offerId) {
                 state: OFFER_STATE.ACTIVE
             })
             .then(resolve('Success'))
-            .catch((err) => reject(err));
+            .catch((err) => reject(ERRORS.UNKOWN));
     });
 }
 
@@ -444,7 +446,78 @@ OfferController.prototype.adminGetOffersForOrder = function(orderId) {
                 'providerUsername price state _id')
             .then((result) => resolve(result))
 
-        .catch((err) => reject(err));
+        .catch((err) => reject(ERRORS.UNKOWN));
+    });
+}
+
+OfferController.prototype.getRefundRequests = function() {
+
+    return new Promise(function(resolve, reject) {
+
+        refundModel.find().select('date type state').sort({ state: -1 })
+            .then((result) => resolve(result))
+            .catch((err) => reject(ERRORS.UNKOWN));
+    });
+}
+
+OfferController.prototype.getRefundDetail = function(refundId) {
+
+    return new Promise(function(resolve, reject) {
+        refundModel.findById(orderId)
+            .then((result) => resolve(result))
+            .catch((err) => reject(ERRORS.UNKOWN));
+    });
+}
+
+OfferController.prototype.acceptRefund = function(refundId) {
+
+    var _self = this;
+
+    return new Promise(function(resolve, reject) {
+
+        if (!_self.validator.validateEmptyOrWhiteSpace(refundId)) {
+            reject(ERRORS.OFFER.REFUNDID_MISSING);
+            return;
+        }
+
+        refundModel.findById(refundId).populate('offerId', 'price')
+            .then((refund) => {
+                if (!refund || refund.length < 1)
+                    reject(ERRORS.OFFER.NO_REFUND_FOUND);
+                else if (refund.state === REFUND_STATE.ACCEPTED) {
+                    reject(ERRORS.OFFER.ALREADY_REQUESTED_REFUND);
+                } else {
+                    paymentModel.findOne({ offerId: refund.offerId }, 'paymentId')
+                        .then((payment) => {
+                            if (!payment || payment.length < 1)
+                                reject(ERRORS.OFFER.NO_REFUND_FOUND);
+                            else
+                                PaymentInterface.refund(payment.paymentId, refund.offerId[0].price * 100)
+                                .then((data) => {
+                                    refund.state = REFUND_STATE.ACCEPTED;
+                                    refund.save();
+                                    resolve('Success');
+                                })
+                                .catch((err) => reject(ERRORS.UNKOWN));
+                        });
+                }
+            })
+    });
+}
+
+OfferController.prototype.rejectRefund = function(refundId) {
+
+    var _self = this;
+
+    return new Promise(function(resolve, reject) {
+        if (!_self.validator.validateEmptyOrWhiteSpace(refundId)) {
+            reject(ERRORS.OFFER.REFUNDID_MISSING);
+            return;
+        }
+
+        refundModel.findByIdAndUpdate(refundId, { state: REFUND_STATE.DENIED })
+            .then((result) => resolve('Success'))
+            .catch((err) => reject(ERRORS.UNKOWN));
     });
 }
 
@@ -464,7 +537,7 @@ OfferController.prototype.getOfferDetails = function(offerId) {
         offerModel.findById(offerId)
             .populate('orderId', 'customerUsername')
             .then((result) => resolve(result))
-            .catch((err) => reject(err));
+            .catch((err) => reject(ERRORS.UNKOWN));
 
     });
 }
@@ -514,7 +587,7 @@ OfferController.prototype.getTopProviders = function(category) {
             .sort({ total: -1 })
             .limit(5)
             .then((result) => resolve(result))
-            .catch((err) => reject(err));
+            .catch((err) => reject(ERRORS.UNKOWN));
     });
 }
 

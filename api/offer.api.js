@@ -376,6 +376,24 @@ module.exports = function offerRouter(app) {
             .catch((err) => res.status(500).send(err));
     });
 
+    app.get('/refunds', function(req, res) {
+        offerController.getRefundRequests()
+            .then((resule) => res.send(resule))
+            .catch((err) => res.status(500).send(err));
+    });
+
+    app.post('/refunds/:refundId/:newState', function(req, res) {
+
+        if (req.params.newState === 1)
+            offerController.acceptRefund(req.params.refundId)
+            .then((resule) => res.send(resule))
+            .catch((err) => res.status(500).send(err));
+        else
+            offerController.rejectRefund(req.params.refundId)
+            .then((resule) => res.send(resule))
+            .catch((err) => res.status(500).send(err));
+    });
+
     //for all==================================================================
 
     /**
