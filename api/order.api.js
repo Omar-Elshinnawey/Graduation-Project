@@ -1,6 +1,5 @@
 var order = require('../controllers/order.controller'),
     multer = require('multer'),
-    cloudinaryStorage = require('multer-storage-cloudinary'),
     middlewares = require('../middlewares/auth.middlewar');
 
 var orderController = new order();

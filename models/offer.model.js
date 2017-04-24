@@ -7,7 +7,7 @@ var OfferSchema = new Schema({
     orderId: [{ type: Schema.Types.ObjectId, ref: 'Order' }],
     providerUsername: String,
     price: Number,
-    //picture,
+    picture: String,
     description: String,
     state: Number,
     rating: Number,

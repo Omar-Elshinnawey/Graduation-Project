@@ -16,6 +16,11 @@ module.exports = Object.freeze({
             message: "Order Id is required"
         },
 
+        PICTURE_MISSING: {
+            code: "Offer/missing picture",
+            message: "A picture is required for the offer"
+        },
+
         INVALID_PRICE: {
             code: "Offer/invalid price",
             message: "Price is required and cannot be less than zero"

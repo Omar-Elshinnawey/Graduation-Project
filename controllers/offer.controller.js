@@ -1,4 +1,5 @@
 const PaymentInterface = require('../externals/payment'),
+    DeliveryController = require('./delivery.controller'),
     offerModel = require('../models/offer.model'),
     orderModel = require('../models/order.model'),
     paymentModel = require('../models/payment.model'),
@@ -9,16 +10,18 @@ const PaymentInterface = require('../externals/payment'),
     REFUND_TYPE = require('../constants/refund.constant'),
     REFUND_STATE = require('../constants/refund-state.constant'),
     CATEGORIES = require('../constants/category.constant'),
+    cloudinary = require('../externals/storage'),
     Validator = require('../controllers/validator.controller'),
     Promise = require('bluebird');
 
 function OfferController() {
     this.validator = new Validator();
+    this.storage = new cloudinary();
 }
 
 //for providers==============================================================================
 
-OfferController.prototype.createOffer = function(providerUsername, orderId, price, description) {
+OfferController.prototype.createOffer = function(providerUsername, orderId, price, description, image) {
 
     var _self = this;
 
@@ -43,38 +46,49 @@ OfferController.prototype.createOffer = function(providerUsername, orderId, pric
             return;
         }
 
-        orderModel.count({
-                _id: orderId,
-                state: ORDER_STATE.ACTIVE
-            })
-            .then((count) => {
-                if (count === 0)
-                    reject(ERRORS.OFFER.ORDER_DOESNOT_EXIST);
-                else {
-                    return offerModel.count({
-                        orderId: orderId,
-                        providerUsername: providerUsername
+        if (!image) {
+            reject(ERRORS.OFFER.PICTURE_MISSING);
+            return;
+        }
+
+        _self.storage.upload(image.buffer)
+            .then((path) => {
+
+                orderModel.count({
+                        _id: orderId,
+                        state: ORDER_STATE.ACTIVE
                     })
-                }
-            })
-            .then((count) => {
+                    .then((count) => {
+                        if (count === 0)
+                            reject(ERRORS.OFFER.ORDER_DOESNOT_EXIST);
+                        else {
+                            return offerModel.count({
+                                orderId: orderId,
+                                providerUsername: providerUsername
+                            });
+                        }
+                    })
+                    .then((count) => {
 
-                if (count > 0) {
-                    reject(ERRORS.OFFER.DUPLICATE_OFFER);
-                } else {
-                    var offer = offerModel({
-                        providerUsername: providerUsername,
-                        orderId: orderId,
-                        price: price,
-                        description: description,
-                        state: OFFER_STATE.ACTIVE
-                    });
+                        if (count > 0) {
+                            reject(ERRORS.OFFER.DUPLICATE_OFFER);
+                        } else {
+                            var offer = offerModel({
+                                providerUsername: providerUsername,
+                                orderId: orderId,
+                                price: price,
+                                description: description,
+                                state: OFFER_STATE.ACTIVE,
+                                picture: path
+                            });
 
-                    offer.save()
-                        .then(resolve('Success'));
-                }
-            })
-            .catch((err) => reject(ERRORS.UNKOWN));
+                            offer.save()
+                                .then(resolve('Success'));
+                        }
+                    })
+                    .catch((err) => reject(ERRORS.UNKOWN));
+
+            }).catch((err) => reject(ERRORS.UNKOWN));
     });
 }
 
@@ -172,30 +186,11 @@ OfferController.prototype.submitForDelivary = function(providerUsername, offerId
 
     return new Promise(function(resolve, reject) {
 
-        if (!_self.validator.validateEmptyOrWhiteSpace(providerUsername)) {
-            reject(ERRORS.OFFER.USERNAME_MISSING);
-            return;
-        }
+        var deliverController = new DeliveryController();
 
-        if (!_self.validator.validateEmptyOrWhiteSpace(offerId)) {
-            reject(ERRORS.OFFER.OFFERID_MISSING);
-            return;
-        }
-
-        offerModel.findById(offerId)
-            .then((result) => {
-                if (providerUsername !== result.providerUsername)
-                    reject(ERRORS.AUTH.NOT_AUTHERIZED);
-                else if (result.state !== OFFER_STATE.ACCEPTED)
-                    reject(ERRORS.OFFER.INVALID_DELIVERY);
-                else {
-                    result.state = OFFER_STATE.ON_ROUTE;
-
-                    result.save()
-                        .then(resolve('Success'));
-                }
-            })
-            .catch((err) => reject(ERRORS.UNKOWN));
+        deliverController.create(providerUsername, offerId)
+            .then((result) => resolve(result))
+            .catch((err) => reject(err));
     });
 }
 

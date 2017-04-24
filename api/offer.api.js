@@ -1,8 +1,14 @@
 var offer = require('../controllers/offer.controller'),
+    delivery = require('../controllers/delivery.controller'),
     REFUND_TYPE = require('../constants/refund.constant'),
-    middlewares = require('../middlewares/auth.middlewar');
+    middlewares = require('../middlewares/auth.middlewar'),
+    multer = require('multer');
 
 var offerController = new offer();
+var deliveryController = new delivery();
+var multerStorage = multer.memoryStorage();
+
+var parser = multer({ storage: multerStorage });
 
 module.exports = function offerRouter(app) {
 
@@ -29,13 +35,14 @@ module.exports = function offerRouter(app) {
      *      "message": "error message" 
      *  }
      */
-    app.post('/myoffers', middlewares.isLoggedinProviderNotBanned, function(req, res) {
+    app.post('/myoffers', middlewares.isLoggedinProviderNotBanned, parser.single('image'), function(req, res) {
 
         offerController.createOffer(
                 req.user.username,
                 req.body.orderId,
                 req.body.price,
-                req.body.description)
+                req.body.description,
+                req.file)
             .then((result) => res.send(result))
             .catch((err) => res.status(500).send(err));
     });
@@ -468,6 +475,13 @@ module.exports = function offerRouter(app) {
 
         offerController.getTopProviders(req.params.category)
             .then((resule) => res.send(resule))
+            .catch((err) => res.status(500).send(err));
+    });
+
+    //for delivery============================================================
+    app.put('/delivery/:offerId', middlewares.isLoggedinDelivery, function(req, res) {
+        deliveryController.updateState(req.params.offerId)
+            .then((result) => res.send(result))
             .catch((err) => res.status(500).send(err));
     });
 }

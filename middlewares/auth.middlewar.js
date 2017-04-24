@@ -62,5 +62,13 @@ module.exports = {
 
         req.logout();
         return res.status(401).send(ERRORS.AUTH.NOT_AUTHENTICATED);
+    },
+
+    isLoggedinDelivery: function(req, res, next) {
+        if (req.isAuthenticated() && req.user.role === ROLES.DELIVERY)
+            return next();
+
+        req.logout();
+        return res.status(401).send(ERRORS.AUTH.NOT_AUTHENTICATED);
     }
 }
