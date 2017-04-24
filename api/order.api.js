@@ -38,7 +38,7 @@ module.exports = function orderRouter(app) {
      *      "message": "error message" 
      *  }
      */
-    app.post('/myorders', middlewares.isLoggedinCustomer, parser.single('image'), function(req, res) {
+    app.post('/myorders', middlewares.isLoggedinCustomerNotBanned, parser.single('image'), function(req, res) {
 
         orderController.createOrder(
                 req.user.username,
@@ -99,7 +99,7 @@ module.exports = function orderRouter(app) {
      *      "message": "error message" 
      *  }
      */
-    app.delete('/myorders/:orderId', middlewares.isLoggedinCustomer, function(req, res) {
+    app.delete('/myorders/:orderId', middlewares.isLoggedinCustomerNotBanned, function(req, res) {
 
         orderController.deleteOrder(req.user.username,
                 req.params.orderId)
@@ -128,7 +128,7 @@ module.exports = function orderRouter(app) {
      *      "message": "error message" 
      *  }
      */
-    app.put('/myorders', middlewares.isLoggedinCustomer, function(req, res) {
+    app.put('/myorders', middlewares.isLoggedinCustomerNotBanned, function(req, res) {
 
         orderController.updateOrder(
                 req.user.username,

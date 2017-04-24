@@ -172,6 +172,10 @@ module.exports = Object.freeze({
         NOT_AUTHENTICATED: {
             code: "Auth/not authenticated",
             message: "Please login to continue"
+        },
+        USER_BANNED: {
+            code: "Auth/user banned",
+            message: "You are banned."
         }
     },
     UNKOWN: {

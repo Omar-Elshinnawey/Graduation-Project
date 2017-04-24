@@ -1,6 +1,8 @@
 const passport = require('passport'),
     ERRORS = require('../constants/error.constant'),
-    middlewares = require('../middlewares/auth.middlewar');
+    middlewares = require('../middlewares/auth.middlewar'),
+    User = require('../models/user.model');
+
 module.exports = function authApi(app, authController) {
 
     app.post('/auth/register', function(req, res) {
@@ -36,6 +38,7 @@ module.exports = function authApi(app, authController) {
                 userobj.name = user.name;
                 userobj.address = user.address;
                 userobj.phone = user.phone;
+                userobj.isbanned = user.isbanned;
 
                 res.send(userobj);
             });
@@ -62,6 +65,7 @@ module.exports = function authApi(app, authController) {
                 userobj.name = result.name;
                 userobj.address = result.address;
                 userobj.phone = result.phone;
+                userobj.isbanned = result.isbanned;
                 res.send(userobj);
             });
         })(req, res);
@@ -72,6 +76,13 @@ module.exports = function authApi(app, authController) {
 
         req.logout();
         res.send(true);
+    });
+
+    app.post('/auth/ban/:username', middlewares.isLoggedinAdmin, function(req, res) {
+
+        authController.banUser(req.params.username)
+            .then((result) => res.send(result))
+            .catch((err) => res.status(500).send(err));
     });
 
     app.get('/providers/:username', middlewares.isLoggedin, function(req, res) {

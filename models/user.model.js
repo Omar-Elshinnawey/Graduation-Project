@@ -11,7 +11,8 @@ var UserSchema = new Schema({
     name: String,
     nationalId: String,
     address: String,
-    phone: String
+    phone: String,
+    isbanned: { type: Boolean, default: false }
 });
 
 UserSchema.plugin(passportLocalMongoose);

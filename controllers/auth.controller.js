@@ -1,12 +1,12 @@
 const passport = require('passport'),
-    passportLocal = require('passport-local'),
-    expressSession = require('express-session'),
-    RedisStore = require('connect-redis')(expressSession),
+    passportLocal = require('passport-local').Strategy,
+    cookieSession = require('cookie-session'),
     User = require('../models/user.model'),
     offerModel = require('../models/offer.model'),
     ROLE = require('../constants/role.constant'),
     ERRORS = require('../constants/error.constant'),
-    Validator = require('../controllers/validator.controller');
+    Validator = require('../controllers/validator.controller'),
+    Promise = require('bluebird');
 
 function AuthController() {
     this.validator = new Validator();
@@ -14,13 +14,11 @@ function AuthController() {
 
 AuthController.prototype.setup = function(app) {
 
-    app.use(expressSession({
-        secret: "abdo took a taxi to the downtown and ate a turkey",
-        store: new RedisStore,
-        resave: false,
-        saveUninitialized: false
+    app.use(cookieSession({
+        keys: ['abdo took a taxi to the downtown and ate a turkey'],
+        name: 'session',
+        maxAge: 24 * 60 * 60 * 1000
     }));
-
 
     app.use(passport.initialize());
     app.use(passport.session());
@@ -129,6 +127,27 @@ AuthController.prototype.getInformation = function(providerUsername) {
             })
             .catch((err) => reject(err));
 
+    });
+}
+
+AuthController.prototype.banUser = function(username) {
+
+    var _self = this;
+    return new Promise(function(resolve, reject) {
+
+        if (!_self.validator.validateEmptyOrWhiteSpace(username)) {
+            reject(ERRORS.AUTH.USERNAME_MISSING);
+            return;
+        }
+
+        User.findOneAndUpdate({ username: username }, { isbanned: true })
+            .then((result) => {
+                if (result && result.length > 1)
+                    result.isbanned = true;
+                result.save()
+                    .then(resolve('Success'));
+            })
+            .catch((err) => reject(ERRORS.UNKOWN));
     });
 }
 

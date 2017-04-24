@@ -29,7 +29,7 @@ module.exports = function offerRouter(app) {
      *      "message": "error message" 
      *  }
      */
-    app.post('/myoffers', middlewares.isLoggedinProvider, function(req, res) {
+    app.post('/myoffers', middlewares.isLoggedinProviderNotBanned, function(req, res) {
 
         offerController.createOffer(
                 req.user.username,
@@ -91,7 +91,7 @@ module.exports = function offerRouter(app) {
      *      "message": "error message" 
      *  }
      */
-    app.delete('/myoffers/:offerId', middlewares.isLoggedinProvider, function(req, res) {
+    app.delete('/myoffers/:offerId', middlewares.isLoggedinProviderNotBanned, function(req, res) {
 
         offerController.deleteOffer(
                 req.user.username,
@@ -121,7 +121,7 @@ module.exports = function offerRouter(app) {
      *      "message": "error message" 
      *  }
      */
-    app.put('/myoffers', middlewares.isLoggedinProvider, function(req, res) {
+    app.put('/myoffers', middlewares.isLoggedinProviderNotBanned, function(req, res) {
 
         offerController.updateOffer(
                 req.user.username,
@@ -151,7 +151,7 @@ module.exports = function offerRouter(app) {
      *      "message": "error message" 
      *  }
      */
-    app.put('/myoffers/submit/:offerId', middlewares.isLoggedinProvider, function(req, res) {
+    app.put('/myoffers/submit/:offerId', middlewares.isLoggedinProviderNotBanned, function(req, res) {
 
         offerController.submitForDelivary(
                 req.user.username,
@@ -223,7 +223,7 @@ module.exports = function offerRouter(app) {
      *      "message": "error message" 
      *  }
      */
-    app.post('/offers/accept', middlewares.isLoggedinCustomer, function(req, res) {
+    app.post('/offers/accept', middlewares.isLoggedinCustomerNotBanned, function(req, res) {
         offerController.acceptOffer(
                 req.user.username,
                 req.body.offerId,
@@ -254,7 +254,7 @@ module.exports = function offerRouter(app) {
      *      "message": "error message" 
      *  }
      */
-    app.post('/offers/rate', middlewares.isLoggedinCustomer, function(req, res) {
+    app.post('/offers/rate', middlewares.isLoggedinCustomerNotBanned, function(req, res) {
 
         offerController.rateOffer(
                 req.user.username,
@@ -285,7 +285,7 @@ module.exports = function offerRouter(app) {
      *      "message": "error message" 
      *  }
      */
-    app.post('/offers/refund', middlewares.isLoggedinCustomer, function(req, res) {
+    app.post('/offers/refund', middlewares.isLoggedinCustomerNotBanned, function(req, res) {
         offerController.requestRefund(
                 req.user.username,
                 req.body.offerId,
@@ -315,7 +315,7 @@ module.exports = function offerRouter(app) {
      *      "message": "error message" 
      *  }
      */
-    app.post('/offers/defect', middlewares.isLoggedinCustomer, function(req, res) {
+    app.post('/offers/defect', middlewares.isLoggedinCustomerNotBanned, function(req, res) {
         offerController.requestRefund(
                 req.user.username,
                 req.body.offerId,
