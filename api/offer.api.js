@@ -1,5 +1,6 @@
 var offer = require('../controllers/offer.controller'),
-    REFUND_TYPE = require('../constants/refund.constant');
+    REFUND_TYPE = require('../constants/refund.constant'),
+    middlewares = require('../middlewares/auth.middlewar');
 
 var offerController = new offer();
 
@@ -28,10 +29,10 @@ module.exports = function offerRouter(app) {
      *      "message": "error message" 
      *  }
      */
-    app.post('/myoffers', function(req, res) {
+    app.post('/myoffers', middlewares.isLoggedinProvider, function(req, res) {
 
         offerController.createOffer(
-                req.body.providerUsername,
+                req.user.username,
                 req.body.orderId,
                 req.body.price,
                 req.body.description)
@@ -65,9 +66,9 @@ module.exports = function offerRouter(app) {
      *      "message": "error message" 
      *  }
      */
-    app.get('/myoffers/:providerUsername', function(req, res) {
+    app.get('/myoffers', middlewares.isLoggedinProvider, function(req, res) {
         offerController.getOffersForProvider(
-                req.params.providerUsername)
+                requser.username)
             .then((result) => res.send(result))
             .catch((err) => res.status(500).send(err));
     });
@@ -90,10 +91,10 @@ module.exports = function offerRouter(app) {
      *      "message": "error message" 
      *  }
      */
-    app.delete('/myoffers/:providerUsername/:offerId', function(req, res) {
+    app.delete('/myoffers/:offerId', middlewares.isLoggedinProvider, function(req, res) {
 
         offerController.deleteOffer(
-                req.params.providerUsername,
+                req.user.username,
                 req.params.offerId)
             .then((result) => res.send(res))
             .catch((err) => res.status(500).send(err));
@@ -120,10 +121,10 @@ module.exports = function offerRouter(app) {
      *      "message": "error message" 
      *  }
      */
-    app.put('/myoffers', function(req, res) {
+    app.put('/myoffers', middlewares.isLoggedinProvider, function(req, res) {
 
         offerController.updateOffer(
-                req.body.providerUsername,
+                req.user.username,
                 req.body.offerId,
                 req.body.description,
                 req.body.price)
@@ -150,10 +151,10 @@ module.exports = function offerRouter(app) {
      *      "message": "error message" 
      *  }
      */
-    app.put('/myoffers/submit/:offerId/:providerUsername', function(req, res) {
+    app.put('/myoffers/submit/:offerId', middlewares.isLoggedinProvider, function(req, res) {
 
         offerController.submitForDelivary(
-                req.params.providerUsername,
+                req.user.username,
                 req.params.offerId)
             .then((result) => res.send(result))
             .catch((err) => res.status(500).send(err));
@@ -187,10 +188,10 @@ module.exports = function offerRouter(app) {
      *      "message": "error message" 
      *  }
      */
-    app.get('/offers/:customerUsername/:orderId', function(req, res) {
+    app.get('/offers/:orderId', middlewares.isLoggedinCustomer, function(req, res) {
 
         offerController.getOffersForOrder(
-                req.params.customerUsername,
+                req.user.username,
                 req.params.orderId)
             .then((result) => res.send(result))
             .catch((err) => res.status(500).send(err));
@@ -222,9 +223,9 @@ module.exports = function offerRouter(app) {
      *      "message": "error message" 
      *  }
      */
-    app.post('/offers/accept', function(req, res) {
+    app.post('/offers/accept', middlewares.isLoggedinCustomer, function(req, res) {
         offerController.acceptOffer(
-                req.body.customerUsername,
+                req.user.username,
                 req.body.offerId,
                 req.body.payment)
             .then((result) => res.send(result))
@@ -253,10 +254,10 @@ module.exports = function offerRouter(app) {
      *      "message": "error message" 
      *  }
      */
-    app.post('/offers/rate', function(req, res) {
+    app.post('/offers/rate', middlewares.isLoggedinCustomer, function(req, res) {
 
         offerController.rateOffer(
-                req.body.customerUsername,
+                req.user.username,
                 req.body.offerId,
                 req.body.review,
                 req.body.rating)
@@ -284,9 +285,9 @@ module.exports = function offerRouter(app) {
      *      "message": "error message" 
      *  }
      */
-    app.post('/offers/refund', function(req, res) {
+    app.post('/offers/refund', middlewares.isLoggedinCustomer, function(req, res) {
         offerController.requestRefund(
-                req.body.customerUsername,
+                req.user.username,
                 req.body.offerId,
                 REFUND_TYPE.REFUND,
                 req.body.reason)
@@ -314,9 +315,9 @@ module.exports = function offerRouter(app) {
      *      "message": "error message" 
      *  }
      */
-    app.post('/offers/defect', function(req, res) {
+    app.post('/offers/defect', middlewares.isLoggedinCustomer, function(req, res) {
         offerController.requestRefund(
-                req.body.customerUsername,
+                req.user.username,
                 req.body.offerId,
                 REFUND_TYPE.DEFECT,
                 req.body.reason)
@@ -344,7 +345,7 @@ module.exports = function offerRouter(app) {
      *      "message": "error message" 
      *  }
      */
-    app.get('/offers/:orderId', function(req, res) {
+    app.get('/offers/:orderId', middlewares.isLoggedinAdmin, function(req, res) {
 
         offerController.adminGetOffersForOrder(req.params.orderId)
             .then((result) => res.send(result))
@@ -369,20 +370,20 @@ module.exports = function offerRouter(app) {
      *      "message": "error message" 
      *  }
      */
-    app.get('/offer/delete/:offerId', function(req, res) {
+    app.get('/offer/delete/:offerId', middlewares.isLoggedinAdmin, function(req, res) {
 
         offerController.adminDeleteOffer(req.params.offerId)
             .then((resule) => res.send(resule))
             .catch((err) => res.status(500).send(err));
     });
 
-    app.get('/refunds', function(req, res) {
+    app.get('/refunds', middlewares.isLoggedinAdmin, function(req, res) {
         offerController.getRefundRequests()
             .then((resule) => res.send(resule))
             .catch((err) => res.status(500).send(err));
     });
 
-    app.post('/refunds/:refundId/:newState', function(req, res) {
+    app.post('/refunds/:refundId/:newState', middlewares.isLoggedinAdmin, function(req, res) {
 
         if (req.params.newState === 1)
             offerController.acceptRefund(req.params.refundId)
@@ -435,7 +436,7 @@ module.exports = function offerRouter(app) {
      *      "message": "error message" 
      *  }
      */
-    app.get('/offer/:offerId', function(req, res) {
+    app.get('/offer/:offerId', middlewares.isLoggedin, function(req, res) {
 
         offerController.getOfferDetails(req.params.offerId)
             .then((result) => res.send(result))
@@ -463,7 +464,7 @@ module.exports = function offerRouter(app) {
      *      "message": "error message" 
      *  }
      */
-    app.get('/top/:category', function(req, res) {
+    app.get('/top/:category', middlewares.isLoggedin, function(req, res) {
 
         offerController.getTopProviders(req.params.category)
             .then((resule) => res.send(resule))

@@ -168,6 +168,10 @@ module.exports = Object.freeze({
         INVALID_LOGIN: {
             code: "Auth/invalid login",
             message: "Wrong username or password"
+        },
+        NOT_AUTHENTICATED: {
+            code: "Auth/not authenticated",
+            message: "Please login to continue"
         }
     },
     UNKOWN: {

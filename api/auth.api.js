@@ -1,5 +1,6 @@
 const passport = require('passport'),
-    ERRORS = require('../constants/error.constant');
+    ERRORS = require('../constants/error.constant'),
+    middlewares = require('../middlewares/auth.middlewar');
 module.exports = function authApi(app, authController) {
 
     app.post('/auth/register', function(req, res) {
@@ -41,7 +42,7 @@ module.exports = function authApi(app, authController) {
         })(req, res);
     });
 
-    app.post('/auth/change', function(req, res) {
+    app.post('/auth/change', middlewares.isLoggedin, function(req, res) {
 
         passport.authenticate('local', function(err, user, info) {
 
@@ -73,7 +74,7 @@ module.exports = function authApi(app, authController) {
         res.send(true);
     });
 
-    app.get('/providers/:username', function(req, res) {
+    app.get('/providers/:username', middlewares.isLoggedin, function(req, res) {
 
         authController.getInformation(req.params.username)
             .then((information) => res.send(information))

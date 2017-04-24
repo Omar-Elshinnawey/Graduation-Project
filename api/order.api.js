@@ -1,6 +1,7 @@
 var order = require('../controllers/order.controller'),
     multer = require('multer'),
-    cloudinaryStorage = require('multer-storage-cloudinary');
+    cloudinaryStorage = require('multer-storage-cloudinary'),
+    middlewares = require('../middlewares/auth.middlewar');
 
 var orderController = new order();
 var multerStorage = multer.memoryStorage();
@@ -37,10 +38,10 @@ module.exports = function orderRouter(app) {
      *      "message": "error message" 
      *  }
      */
-    app.post('/myorders', parser.single('image'), function(req, res) {
+    app.post('/myorders', middlewares.isLoggedinCustomer, parser.single('image'), function(req, res) {
 
         orderController.createOrder(
-                req.body.customerUsername,
+                req.user.username,
                 req.body.description,
                 req.body.Category,
                 req.body.title,
@@ -73,9 +74,9 @@ module.exports = function orderRouter(app) {
      *      "message": "error message" 
      *  }
      */
-    app.get('/myorders/:customerUsername', function(req, res) {
+    app.get('/myorders', middlewares.isLoggedinCustomer, function(req, res) {
 
-        orderController.getOrdersForCustomer(req.params.customerUsername)
+        orderController.getOrdersForCustomer(req.user.username)
             .then((result) => res.send(result))
             .catch((err) => res.status(500).send(err));
     });
@@ -98,9 +99,9 @@ module.exports = function orderRouter(app) {
      *      "message": "error message" 
      *  }
      */
-    app.delete('/myorders/:customerUsername/:orderId', function(req, res) {
+    app.delete('/myorders/:orderId', middlewares.isLoggedinCustomer, function(req, res) {
 
-        orderController.deleteOrder(req.params.customerUsername,
+        orderController.deleteOrder(req.user.username,
                 req.params.orderId)
             .then((result) => res.send(result))
             .catch((err) => res.status(500).send(err));
@@ -127,10 +128,10 @@ module.exports = function orderRouter(app) {
      *      "message": "error message" 
      *  }
      */
-    app.put('/myorders', function(req, res) {
+    app.put('/myorders', middlewares.isLoggedinCustomer, function(req, res) {
 
         orderController.updateOrder(
-                req.body.customerUsername,
+                req.user.username,
                 req.body.orderId,
                 req.body.description,
                 req.body.Category,
@@ -166,7 +167,7 @@ module.exports = function orderRouter(app) {
      *      "message": "error message" 
      *  }
      */
-    app.get('/orders/:Category', function(req, res) {
+    app.get('/orders/:Category', middlewares.isLoggedinAdminOrProvider, function(req, res) {
 
         orderController.getOrdersInCategory(
                 req.params.Category)
@@ -195,7 +196,7 @@ module.exports = function orderRouter(app) {
      *      "message": "error message" 
      *  }
      */
-    app.get('/order/delete/:orderId', function(req, res) {
+    app.get('/order/delete/:orderId', middlewares.isLoggedinAdmin, function(req, res) {
 
         orderController.adminDeleteOrder(req.params.orderId)
             .then((result) => res.send(result))
@@ -234,7 +235,7 @@ module.exports = function orderRouter(app) {
      *      "message": "error message" 
      *  }
      */
-    app.get('/order/:orderId', function(req, res) {
+    app.get('/order/:orderId', middlewares.isLoggedin, function(req, res) {
 
         orderController.getOrderDetails(req.params.orderId)
             .then((result) => res.send(result))
