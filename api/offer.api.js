@@ -484,4 +484,17 @@ module.exports = function offerRouter(app) {
             .then((result) => res.send(result))
             .catch((err) => res.status(500).send(err));
     });
+
+    app.get('/delivery', middlewares.isLoggedinDelivery, function(req, res) {
+        deliveryController.getDeliveries()
+            .then((result) => res.send(result))
+            .catch((err) => res.status(500).send(err));
+    });
+
+    app.get('/delivery/:deliveryId', function(req, res) {
+
+        deliveryController.getDeliveryDetail(req.params.deliveryId)
+            .then((result) => res.send(result))
+            .catch((err) => res.status(500).send(err));
+    });
 }

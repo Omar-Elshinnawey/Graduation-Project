@@ -85,4 +85,26 @@ Delivery.prototype.updateState = function(offerId) {
     });
 }
 
+Delivery.prototype.getDeliveries = function() {
+
+    return new Promise(function(resolve, reject) {
+
+        delivery.find()
+            .select('fromAddress toAddress expectedDate')
+            .then((result) => resolve(result))
+            .catch((err) => reject(ERRORS.UNKOWN));
+    });
+}
+
+Delivery.prototype.getDeliveryDetail = function(deliveryId) {
+
+    return new Promise(function(resolve, reject) {
+
+        delivery.findById(deliveryId)
+            .populate('orderId offerId')
+            .then((result) => resolve(result))
+            .catch((err) => reject(ERRORS.UNKOWN));
+    });
+}
+
 module.exports = Delivery;
