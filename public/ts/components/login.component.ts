@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
+import {HeaderService} from '../services/header.service';
+
 @Component({
     selector: 'login',
     templateUrl: '/assets/views/login.component.html',
@@ -8,7 +10,7 @@ import { Router } from '@angular/router';
 })
 export class LoginComponent implements OnInit{
 
-    constructor(private router: Router){}
+    constructor(private router: Router, public header: HeaderService){}
 
     model = {
         username: '',
@@ -16,8 +18,9 @@ export class LoginComponent implements OnInit{
     }
 
     ngOnInit(){
+        this.header.hide();
         if(localStorage.getItem('currentUser'))
-            this.router.navigate(['/dashboard'])
+            this.router.navigate(['/dashboard']);
     }
 
     onsubmit(){

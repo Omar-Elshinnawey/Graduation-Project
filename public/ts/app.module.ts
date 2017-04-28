@@ -3,9 +3,12 @@ import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { RouterModule} from '@angular/router';
 
-import { LoginComponent }  from './login.component';
-import { DashboardComponent } from './dashboard.component';
-import { AppComponent } from './app.component';
+import { LoginComponent }  from './components/login.component';
+import { DashboardComponent } from './components/dashboard.component';
+import { AppComponent } from './components/app.component';
+import {HeaderComponent} from './components/header.component';
+
+import {HeaderService} from './services/header.service'
 
 import {AppRoutingModule} from './app-routing.module';
 
@@ -17,8 +20,10 @@ import {AppRoutingModule} from './app-routing.module';
                   ],
   declarations: [ LoginComponent,
                   DashboardComponent,
-                  AppComponent],
+                  AppComponent,
+                  HeaderComponent],
   bootstrap:    [ AppComponent ],
+  providers: [HeaderService]
 })
 
 export class AppModule { }
