@@ -19,11 +19,17 @@ auth.setup(app);
 var port = process.env.PORT || 3000;
 
 app.use(express.static('apidoc'));
+app.use('/libs', express.static('node_modules'));
+app.use('/assets', express.static('public'));
 
 orderApi(app);
 offerApi(app);
 authAPi(app, auth);
-//TODO: USE bluebird!! SAVE YOURSELF FROM CALLBACK HELL!!
+
+app.get('/en*', function(req, res) {
+    res.sendFile(__dirname + '/public/en.html');
+});
+
 mongoose.Promise = require('bluebird') /*global.Promise*/ ;
 
 mongoose.connect(dbConfig());

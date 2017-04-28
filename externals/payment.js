@@ -6,6 +6,8 @@ Payment = {
     makePayment: function(paymentObject) {
         return new Promise(function(resolve, reject) {
 
+            paymentObject.number = paymentObject.number.replace(/\s+/g, '');
+
             paymentClient.payment.create({
                 amount: paymentObject.amount,
                 card: {
