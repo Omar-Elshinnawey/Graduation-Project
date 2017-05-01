@@ -1,17 +1,20 @@
-<div class="login">
+<div class="login" [dir]="translate.dir">
 
     <img class="logo" src="/assets/imgs/dakakeen.png" alt="Dakakeen">
     <form #loginForm="ngForm" (ngSubmit)="onsubmit()">
         <div class="form-group">
-            <label for="username" class="control-label">Username</label>
-            <input type="text" name="username" id="username" placeholder="Username" class="form-control" required [(ngModel)]="model.username">
+            <label for="username" class="control-label">{{"USERNAME" | translate}}</label>
+            <input type="text" name="username" id="username" placeholder="{{'USERNAME' | translate}}" class="form-control" required [(ngModel)]="model.username">
         </div>
 
         <div class="form-group">
-            <label for="password" class="control-label">Password</label>
-            <input type="password" name="password" id="password" placeholder="Password" class="form-control" required [(ngModel)]="model.password">
+            <label for="password" class="control-label">{{"PASSWORD" | translate}}</label>
+            <input type="password" name="password" id="password" placeholder="{{'PASSWORD' | translate}}" class="form-control" required [(ngModel)]="model.password">
         </div>
 
-        <input type="submit" value="Login" class="btn btn-primary btn-block" [disabled]="!loginForm.form.valid">
+        <input type="submit" value="{{'LOGIN' | translate}}" class="btn btn-primary btn-block" [disabled]="!loginForm.form.valid">
     </form>
+
+    <button type="button" (click)="translate.changeLang('en')" class="btn btn-primary">English</button>
+    <button type="button" (click)="translate.changeLang('ar')" class="btn btn-primary">عربي</button>
 </div>
