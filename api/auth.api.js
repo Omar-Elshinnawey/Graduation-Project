@@ -17,7 +17,7 @@ module.exports = function authApi(app, authController) {
                 req.body.address,
                 req.body.phone)
             .then((result) => res.send(result))
-            .catch((err) => res.send(err));
+            .catch((err) => res.status(500).send(err));
     });
 
     app.post('/auth/login', function(req, res) {
@@ -89,6 +89,6 @@ module.exports = function authApi(app, authController) {
 
         authController.getInformation(req.params.username)
             .then((information) => res.send(information))
-            .catch((err) => res.send(err));
+            .catch((err) => res.status(500).send(err));
     });
 }
