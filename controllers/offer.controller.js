@@ -106,7 +106,7 @@ OfferController.prototype.getOffersForProvider = function(providerUsername) {
         offerModel.find({
                     providerUsername: providerUsername
                 },
-                'providerUsername price _id')
+                'providerUsername price state _id')
             .then((result) => resolve(result))
             .catch((err) => reject(ERRORS.UNKOWN));
     });
