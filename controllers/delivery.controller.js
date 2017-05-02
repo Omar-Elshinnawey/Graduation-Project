@@ -96,13 +96,18 @@ Delivery.prototype.getDeliveries = function() {
     });
 }
 
-Delivery.prototype.getDeliveryDetail = function(deliveryId) {
+Delivery.prototype.getDeliveryDate = function(orderId, customerUsername) {
 
     return new Promise(function(resolve, reject) {
 
-        delivery.findById(deliveryId)
-            .populate('orderId offerId')
-            .then((result) => resolve(result))
+        delivery.findOne({ orderId: orderId })
+            .populate('orderId', customerUsername)
+            .then((result) => {
+                if (result && result.orderId[0].customerUsername === customerUsername)
+                    resolve(result);
+                else
+                    reject(ERRORS.OFFER.ORDER_DOESNOT_EXIST);
+            })
             .catch((err) => reject(ERRORS.UNKOWN));
     });
 }

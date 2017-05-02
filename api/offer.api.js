@@ -22,6 +22,7 @@ module.exports = function offerRouter(app) {
      * @apiParam {String} orderId id of the order
      * @apiParam {Number} price The price of the offer
      * @apiParam {String} description The offer description
+     * @apiParam {File} image An image to descripe the offer
      * @apiSuccess {String} Success
      * @apiSuccessExample {String} Success
      *  HTTP/1.1 200 OK
@@ -55,12 +56,17 @@ module.exports = function offerRouter(app) {
      * @apiSuccess {String} offers._id offer ID
      * @apiSuccess {String} offers.providerUsername The username of provider who created the offer
      * @apiSuccess {Number} offers.price The price of the offer 
+     * @apiSuccess {Object([])} offers.orderId
+     * @apiSuccess {String} offers.orderId.title The order title
      * @apiSuccessExample {json} Success
      *  HTTP/1.1 200 OK
      *  [
      *      {
      *          "_id": "offer id",
      *          "providerUsername": "name of provider",
+     *          "orderId":[{
+     *              "title": "order title"
+     *           }]
      *          "price": 100
      *      }
      *  ]
@@ -75,7 +81,7 @@ module.exports = function offerRouter(app) {
      */
     app.get('/myoffers', middlewares.isLoggedinProvider, function(req, res) {
         offerController.getOffersForProvider(
-                requser.username)
+                req.user.username)
             .then((result) => res.send(result))
             .catch((err) => res.status(500).send(err));
     });
@@ -384,12 +390,59 @@ module.exports = function offerRouter(app) {
             .catch((err) => res.status(500).send(err));
     });
 
+    /**
+     * @api {get} /refunds Get refund requests
+     * @apiGroup Admin functions
+     * @apiDescription
+     * Administrator gets all refund requests
+     * @apiSuccess {Object([])} refunds
+     * @apiSuccess {String} refunds._id The id of the request
+     * @apiSuccess {String} refunds.date The date in which the request was submitted
+     * @apiSuccess {number=0,1} refund.type The type of the request 0 means normal refund 1 means refund of defect
+     * @apiSuccess {number=0,1,2} refund.state The state of the request 0 means active, 1 means accepted and 2 means denied
+     * @apiSuccessExample {String} Success
+     *  HTTP/1.1 200 OK
+     *  [{
+     *      "_id": "request_id",
+     *      "date": "5/2/2017",
+     *      "type": 1,
+     *      "state": 0
+     *  }]
+     * @apiError (Error 500) {String} code The error code
+     * @apiError (Error 500) {String} message The error message
+     * @apiErrorExample {json} Error
+     *  HTTP/1.1 500 Internal Server Error
+     *  {
+     *      "code": "Order/error code",
+     *      "message": "error message" 
+     *  }
+     */
     app.get('/refunds', middlewares.isLoggedinAdmin, function(req, res) {
         offerController.getRefundRequests()
             .then((resule) => res.send(resule))
             .catch((err) => res.status(500).send(err));
     });
 
+    /**
+     * @api {post} /refunds/:refundId/:newState Accept or reject a refund
+     * @apiGroup Admin functions
+     * @apiDescription
+     * Admin accepts or denies a refund request
+     * @apiParam {String} refundId id of the refund request
+     * @apiParam {Number} newState 1 to accept refund other values to deny
+     * @apiSuccess {String} Success
+     * @apiSuccessExample {String} Success
+     *  HTTP/1.1 200 OK
+     *  'Success'
+     * @apiError (Error 500) {String} code The error code
+     * @apiError (Error 500) {String} message The error message
+     * @apiErrorExample {json} Error
+     *  HTTP/1.1 500 Internal Server Error
+     *  {
+     *      "code": "Order/error code",
+     *      "message": "error message" 
+     *  }
+     */
     app.post('/refunds/:refundId/:newState', middlewares.isLoggedinAdmin, function(req, res) {
 
         if (req.params.newState === 1)
@@ -479,21 +532,89 @@ module.exports = function offerRouter(app) {
     });
 
     //for delivery============================================================
+
+    /**
+     * @api {put} /delivery/:offerId Report offer delivery
+     * @apiGroup Delivery
+     * @apiDescription
+     * Report that an offer has been delivered
+     * @apiParam {String} offerId The offer ID
+     * @apiSuccessExample {String} Success
+     *  HTTP/1.1 200 OK
+     *  'Success'
+     * @apiError (Error 500) {String} code The error code
+     * @apiError (Error 500) {String} message The error message
+     * @apiErrorExample {json} Error
+     *  HTTP/1.1 500 Internal Server Error
+     *  {
+     *      "code": "Order/error code",
+     *      "message": "error message" 
+     *  }
+     */
     app.put('/delivery/:offerId', middlewares.isLoggedinDelivery, function(req, res) {
         deliveryController.updateState(req.params.offerId)
             .then((result) => res.send(result))
             .catch((err) => res.status(500).send(err));
     });
 
+    /**
+     * @api {get} /delivery Get deliveries
+     * @apiGroup Delivery
+     * @apiDescription
+     * Get all deliveries
+     * @apiSuccess {Object([])} deliveries
+     * @apiSuccess {String} deliveries._id The delivery id
+     * @apiSuccess {String} deliveries.fromAddress The provider address
+     * @apiSuccess {String} deliveries.toAddress The customer address
+     * @apiSuccess {String} deliveries.expectedDate The date in which the delivery is expected to be delivered
+     * @apiSuccessExample {json} Success
+     *  HTTP/1.1 200 OK
+     *  [{
+     *      "_id": "delivery_id"
+     *      "fromAddress": "provider address",
+     *      "toAddress": "customer address",
+     *      "expectedDate": "5/20/2017"
+     *  }]
+     * @apiError (Error 500) {String} code The error code
+     * @apiError (Error 500) {String} message The error message
+     * @apiErrorExample {json} Error
+     *  HTTP/1.1 500 Internal Server Error
+     *  {
+     *      "code": "Order/error code",
+     *      "message": "error message" 
+     *  }
+     */
     app.get('/delivery', middlewares.isLoggedinDelivery, function(req, res) {
         deliveryController.getDeliveries()
             .then((result) => res.send(result))
             .catch((err) => res.status(500).send(err));
     });
 
-    app.get('/delivery/:deliveryId', function(req, res) {
+    /**
+     * @api {get} /delivery/:orderId Get delivery date
+     * @apiGroup Delivery
+     * @apiDescription
+     * Get delivery expected date
+     * @apiSuccess {String} _id The delivery id
+     * @apiSuccess {String} expectedDate The date in which the delivery is expected to be delivered
+     * @apiSuccessExample {json} Success
+     *  HTTP/1.1 200 OK
+     *  {
+     *      "_id": "delivery_id"
+     *      "expectedDate": "5/20/2017"
+     *  }
+     * @apiError (Error 500) {String} code The error code
+     * @apiError (Error 500) {String} message The error message
+     * @apiErrorExample {json} Error
+     *  HTTP/1.1 500 Internal Server Error
+     *  {
+     *      "code": "Order/error code",
+     *      "message": "error message" 
+     *  }
+     */
+    app.get('/delivery/:orderId', middlewares.isLoggedinCustomer, function(req, res) {
 
-        deliveryController.getDeliveryDetail(req.params.deliveryId)
+        deliveryController.getDeliveryDate(req.params.deliveryId, req.user.username)
             .then((result) => res.send(result))
             .catch((err) => res.status(500).send(err));
     });

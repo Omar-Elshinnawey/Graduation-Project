@@ -106,7 +106,8 @@ OfferController.prototype.getOffersForProvider = function(providerUsername) {
         offerModel.find({
                     providerUsername: providerUsername
                 },
-                'providerUsername price state _id')
+                'providerUsername price state orderId')
+            .populate('orderId', 'title')
             .then((result) => resolve(result))
             .catch((err) => reject(ERRORS.UNKOWN));
     });

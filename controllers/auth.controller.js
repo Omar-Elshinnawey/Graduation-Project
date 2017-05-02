@@ -109,15 +109,15 @@ AuthController.prototype.getInformation = function(providerUsername) {
         var information = {};
 
         User.findOne({
-                name: providerUsername,
+                username: providerUsername,
                 role: ROLE.PROVIDER
-            }, 'name')
+            }, 'username')
             .then((result) => {
                 if (!result || result.length === 0)
                     reject(ERRORS.AUTH.PROVIDER_NOT_FOUND);
                 else {
 
-                    information.name = result.name;
+                    information.name = result.username;
                     return getAverageRating(providerUsername);
                 }
             })
