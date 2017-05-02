@@ -23,6 +23,13 @@ nav *,
 
 .navbar-btn {
     background-color: transparent;
+    border: none;
+}
+
+.navbar-btn:focus,
+.navbar-btn:active:focus {
+    outline: none;
+    border: none;
 }
 
 .navbar-inverse .navbar-toggle,
@@ -33,4 +40,10 @@ nav *,
 
 .navbar-inverse .navbar-toggle:hover {
     background-color: #420b25;
+}
+
+@media (max-width: 768px) {
+    ul.nav {
+        padding: 0;
+    }
 }

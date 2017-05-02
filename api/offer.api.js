@@ -485,7 +485,8 @@ module.exports = function offerRouter(app) {
      *  {
      *      "_id": "58e8a28d99ebb8337c9a0abf",
      *      "customerUsername": "test"
-     *  }]
+     *  }],
+     *  "picture": "picture url"
      * }
      * @apiError (Error 500) {String} code The error code
      * @apiError (Error 500) {String} message The error message

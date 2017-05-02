@@ -1,3 +1,8 @@
+<div class="langChange">
+    <button type="button" (click)="translate.changeLang('en')" class="btn btn-primary">English</button>
+    <button type="button" (click)="translate.changeLang('ar')" class="btn btn-primary">عربي</button>
+</div>
+
 <div class="login" [dir]="translate.dir">
 
     <img class="logo" src="/assets/imgs/dakakeen.png" alt="Dakakeen">
@@ -14,7 +19,4 @@
 
         <input type="submit" value="{{'LOGIN' | translate}}" class="btn btn-primary btn-block" [disabled]="!loginForm.form.valid">
     </form>
-
-    <button type="button" (click)="translate.changeLang('en')" class="btn btn-primary">English</button>
-    <button type="button" (click)="translate.changeLang('ar')" class="btn btn-primary">عربي</button>
 </div>

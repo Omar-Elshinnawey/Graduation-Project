@@ -11,7 +11,7 @@ import {HeaderService} from '../services/header.service';
 })
 export class LoginComponent implements OnInit{
 
-    constructor(private router: Router, public header: HeaderService, private translate: TranslationService){}
+    constructor(private router: Router, public header: HeaderService, public translate: TranslationService){}
 
     model = {
         username: '',

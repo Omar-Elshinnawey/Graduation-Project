@@ -1,27 +1,33 @@
 <nav *ngIf="header.visible" class="navbar navbar-inverse">
 
-    <div class="container">
-        <div class="navbar-header">
+    <div class="container" [dir]="translate.dir">
+        <div [ngClass]="{'navbar-header': true, 'navbar-right': translate.getCurrentLang() === 'ar'}">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".collapse">
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span> 
             </button>
             <a class="navbar-brand" [routerLink]="['/']">
-                Dakakeen
+                {{"DAKAKEEN" | translate}}
             </a>
         </div>
 
         <div class="collapse navbar-collapse">
-            <ul class="nav navbar-nav">
-                <li [routerLinkActive]="['active']"><a [routerLink]="['/dashboard']">Dashboard</a></li>
-                <li><a href="#">Orders</a></li>
-                <li><a href="#">Offers</a></li>
+            <ul [ngClass]="{'nav': true, 'navbar-nav': true, 'navbar-right': translate.getCurrentLang() === 'ar'}">
+                <li [routerLinkActive]="['active']"><a [routerLink]="['/dashboard']">{{ "DASHBOARD" | translate}}</a></li>
+                <li><a href="#">{{ "ORDERS" | translate}}</a></li>
+                <li><a href="#">{{ "OFFERS" | translate}}</a></li>
             </ul>
 
-            <ul class="nav navbar-nav navbar-right">
+            <ul [ngClass]="{'nav': true, 'navbar-nav': true, 'navbar-right': translate.getCurrentLang() === 'en'}">
                 <li>
-                    <button type="button" class="btn navbar-btn" (click)="logout()">Logout</button>
+                    <button type="button" class="btn navbar-btn" (click)="logout()">{{ "LOGOUT" | translate}}</button>
+                </li>
+                <li>
+                    <button type="button" class="btn navbar-btn" (click)="translate.changeLang('en')">English</button>
+                </li>
+                <li>
+                    <button type="button" class="btn navbar-btn" (click)="translate.changeLang('ar')">عربي</button>
                 </li>
             </ul>
         </div>

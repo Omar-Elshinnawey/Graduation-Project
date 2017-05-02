@@ -1,0 +1,65 @@
+.ratings {
+    margin: 10px auto;
+    padding: 10px 0;
+    overflow: hidden;
+}
+
+.panel-body table td,
+.panel-body table th {
+    border: none;
+}
+
+.rate {
+    float: left;
+}
+
+.list-group,
+.panel {
+    padding: 0;
+}
+
+.panel {
+    border-color: #86194c;
+}
+
+.panel-heading {
+    background-color: #86194c;
+    border-color: #86194c;
+}
+
+.panel-body {
+    background-color: #9e466f;
+}
+
+.list-group-item {
+    word-wrap: break-word;
+    border: none;
+    background-color: transparent;
+    color: white;
+}
+
+.badge {
+    background-color: white;
+    color: #86194c;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+    .col-sm-5 {
+        margin-left: 4%;
+        margin-right: 4%;
+    }
+}
+
+@media (min-width: 992px) and (max-width: 1199px) {
+    .col-md-3 {
+        margin-left: 4.1666%;
+        margin-right: 4.1666%;
+    }
+}
+
+@media (min-width: 1200px) {
+    .col-md-3 {
+        margin-left: 1.6%;
+        margin-right: 1.6%;
+    }
+}

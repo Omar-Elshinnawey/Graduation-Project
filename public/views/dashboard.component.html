@@ -1,3 +1,28 @@
-<div>
-    <h1>Dashboard</h1>
+<div class="dashboard" [dir]="translate.dir">
+    <h1>{{"DASHBOARD" | translate}}</h1>
+
+    <div class="ratings">
+
+        <div class="panel panel-primary col-lg-2 col-md-3 col-sm-5 col-xs-12 clearfix" *ngFor="let category of categories">
+            <div class="panel-heading">
+                <h3 class="panel-title">{{ category | translate }}</h3>
+            </div>
+
+            <div class="panel-body">
+                <ul class="list-group">
+                    <li class="list-group-item clearfix">
+                        <span>Ahmed</span><span [ngClass]="{'badge': true, 'rate': translate.getCurrentLang() === 'ar'}">3.5</span></li>
+                    <li class="list-group-item clearfix">
+                        <span>Ahmed</span><span [ngClass]="{'badge': true, 'rate': translate.getCurrentLang() === 'ar'}">3.5</span></li>
+                    <li class="list-group-item clearfix">
+                        <span>Ahmed</span><span [ngClass]="{'badge': true, 'rate': translate.getCurrentLang() === 'ar'}">3.5</span></li>
+                    <li class="list-group-item clearfix">
+                        <span>Ahmed</span><span [ngClass]="{'badge': true, 'rate': translate.getCurrentLang() === 'ar'}">3.5</span></li>
+                    <li class="list-group-item clearfix">
+                        <span>Ahmed</span><span [ngClass]="{'badge': true, 'rate': translate.getCurrentLang() === 'ar'}">3.5</span></li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
 </div>

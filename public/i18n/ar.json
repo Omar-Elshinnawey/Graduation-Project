@@ -1,5 +1,15 @@
 {
     "USERNAME": "اسم المستخدم",
     "PASSWORD": "كلمة المرور",
-    "LOGIN": "تسجيل دخول"
+    "LOGIN": "تسجيل دخول",
+    "DAKAKEEN": "دكاكين",
+    "DASHBOARD": "لوحة التحكم",
+    "ORDERS": "الطلبات",
+    "OFFERS": "العروض",
+    "LOGOUT": "تسجيل خروج",
+    "FOOD": "أطعمة",
+    "HANDCRAFT": "صناعات يدوية",
+    "FASHION": "أزياء",
+    "ACCESSORY": "إكسسوارات",
+    "PAINTING": "لوحات فنية"
 }

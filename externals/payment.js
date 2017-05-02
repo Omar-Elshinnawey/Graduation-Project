@@ -9,7 +9,7 @@ Payment = {
             paymentObject.number = paymentObject.number.replace(/\s+/g, '');
 
             paymentClient.payment.create({
-                amount: paymentObject.amount,
+                amount: paymentObject.amount / 3.75,
                 card: {
                     expMonth: paymentObject.emonth,
                     expYear: paymentObject.eyear,

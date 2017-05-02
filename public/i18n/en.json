@@ -1,5 +1,15 @@
 {
     "USERNAME": "Username",
     "PASSWORD": "Password",
-    "LOGIN": "Login"
+    "LOGIN": "Login",
+    "DAKAKEEN": "Dakakeen",
+    "DASHBOARD": "Dashboard",
+    "ORDERS": "Orders",
+    "OFFERS": "Offers",
+    "LOGOUT": "Logout",
+    "FOOD": "Food",
+    "HANDCRAFT": "Handcraft",
+    "FASHION": "Fashion",
+    "ACCESSORY": "Accessory",
+    "PAINTING": "Paining"
 }

@@ -215,6 +215,7 @@ module.exports = function orderRouter(app) {
      * @apiSuccess {number=0,1} state The order's state
      * @apiSuccess {String} description The order discription
      * @apiSuccess {number=0,1,2,3,4} Category The category of the order
+     * @apiSuccess {String} picture The order picture
      * 
      * @apiSuccessExample {json} Success
      *  HTTP/1.1 200 OK
@@ -223,7 +224,8 @@ module.exports = function orderRouter(app) {
      *      "title": "order title",
      *      "state": 1,
      *      "Category": 2,
-     *      "description": "order description"
+     *      "description": "order description",
+     *      "picture": "image url"
      * }
      * @apiError (Error 500) {String} code The error code
      * @apiError (Error 500) {String} message The error message

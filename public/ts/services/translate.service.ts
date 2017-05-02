@@ -21,4 +21,8 @@ export class TranslationService{
         else
             this.dir = 'rtl';
     }
+
+    getCurrentLang(): String{
+        return this.translate.currentLang;
+    }
 }
