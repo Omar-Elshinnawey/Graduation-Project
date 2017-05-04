@@ -1,6 +1,7 @@
 var order = require('../controllers/order.controller'),
     multer = require('multer'),
-    middlewares = require('../middlewares/auth.middlewar');
+    middlewares = require('../middlewares/auth.middlewar'),
+    path = require('path');
 
 var orderController = new order();
 var multerStorage = multer.memoryStorage();
@@ -8,10 +9,6 @@ var multerStorage = multer.memoryStorage();
 var parser = multer({ storage: multerStorage });
 
 module.exports = function orderRouter(app) {
-
-    app.get('/', function(req, res) {
-        res.sendFile(__dirname + '/apidoc/index.html');
-    });
 
     //for customers===========================================
 

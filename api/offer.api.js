@@ -109,7 +109,7 @@ module.exports = function offerRouter(app) {
         offerController.deleteOffer(
                 req.user.username,
                 req.params.offerId)
-            .then((result) => res.send(res))
+            .then((result) => res.send(result))
             .catch((err) => res.status(500).send(err));
 
     });
