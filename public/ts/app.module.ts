@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule} from '@angular/router';
 import {TranslateModule, TranslateLoader} from '@ngx-translate/core';
 import {TranslateHttpLoader} from '@ngx-translate/http-loader';
+import {MaterializeModule} from 'angular2-materialize/dist/index';
 
 import { LoginComponent }  from './components/login.component';
 import { DashboardComponent } from './components/dashboard.component';
@@ -24,6 +25,7 @@ export function createTranslateLoader(http: Http){
   imports:      [ 
                   BrowserModule,
                   FormsModule,
+                  MaterializeModule,
                   AppRoutingModule,
                   HttpModule,
                   TranslateModule.forRoot({

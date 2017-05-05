@@ -1,3 +1,4 @@
+const webpack = require('webpack');
 var config = {
 
     context: __dirname + '/public',
@@ -18,7 +19,17 @@ var config = {
             loader: 'ts-loader',
             exclude: /node_modules/
         }]
-    }
+    },
+
+    plugins: [
+        new webpack.ProvidePlugin({
+            $: 'jquery',
+            jQuery: 'jquery',
+            'window.jQuery': 'jquery',
+            Hammer: 'hammerjs/hammer',
+            Materialize: 'materialize-css'
+        })
+    ]
 }
 
 module.exports = config;
