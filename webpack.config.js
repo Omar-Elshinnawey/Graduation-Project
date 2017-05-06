@@ -1,4 +1,5 @@
-const webpack = require('webpack');
+const webpack = require('webpack'),
+    path = require('path');
 var config = {
 
     context: __dirname + '/public',
@@ -23,11 +24,11 @@ var config = {
 
     plugins: [
         new webpack.ProvidePlugin({
-            $: 'jquery',
-            jQuery: 'jquery',
-            'window.jQuery': 'jquery',
-            Hammer: 'hammerjs/hammer',
-            Materialize: 'materialize-css'
+            $: "jquery",
+            jQuery: "jquery",
+            "window.jQuery": "jquery",
+            Hammer: "hammerjs/hammer",
+            Materialize: "materialize-css"
         })
     ]
 }
