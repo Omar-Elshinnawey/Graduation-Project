@@ -2,7 +2,6 @@
 html,
 body {
     width: 100%;
-    height: 100%;
     margin: 0;
     padding: 0;
 }
@@ -11,33 +10,43 @@ body {
     background: #fffdf7;
 }
 
+.loading {
+    display: -webkit-flex;
+    -webkit-flex-direction: column;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #86194c;
+}
+
+.active .spinner-layer {
+    border-color: #c25975;
+}
+
+.preloader-wrapper,
+.loading-txt {
+    display: block;
+    margin: 0 auto;
+    color: white;
+}
+
 login {
     width: 100%;
 }
 
-.form-control {
-    color: #86194c;
-}
-
-.form-control:focus {
-    border-color: #86194c;
-    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px #86194c;
-}
-
-.btn-primary,
-.btn-primary:active,
-.btn-primary:focus,
-.btn-primary:active:focus {
+.btn,
+.btn:active,
+.btn:focus,
+.btn:active:focus {
     background-color: #86194c;
-    border-color: #59596a;
     font-weight: bold;
     outline: none;
 }
 
-.btn-primary:hover,
-.btn-primary:active:hover,
-.btn-primary:focus:hover,
-.btn-primary[disabled]:hover {
+.btn:hover,
+.btn:active:hover,
+.btn:focus:hover {
     background-color: #c25975;
-    border-color: #6b9267
 }

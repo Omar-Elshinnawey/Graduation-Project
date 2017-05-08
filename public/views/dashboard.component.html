@@ -1,26 +1,28 @@
 <div class="dashboard" [dir]="translate.dir">
-    <h1>{{"DASHBOARD" | translate}}</h1>
+    <h2>{{"DASHBOARD" | translate}}</h2>
 
-    <div class="ratings">
+    <div class="ratings row">
 
-        <div class="panel panel-primary col-lg-2 col-md-3 col-sm-5 col-xs-12 clearfix" *ngFor="let category of categories">
-            <div class="panel-heading">
-                <h3 class="panel-title">{{ category | translate }}</h3>
-            </div>
+        <div class="col s12 m5 l5 xl5" *ngFor="let category of categories">
 
-            <div class="panel-body">
-                <ul class="list-group">
-                    <li class="list-group-item clearfix">
-                        <span>Ahmed</span><span [ngClass]="{'badge': true, 'rate': translate.getCurrentLang() === 'ar'}">3.5</span></li>
-                    <li class="list-group-item clearfix">
-                        <span>Ahmed</span><span [ngClass]="{'badge': true, 'rate': translate.getCurrentLang() === 'ar'}">3.5</span></li>
-                    <li class="list-group-item clearfix">
-                        <span>Ahmed</span><span [ngClass]="{'badge': true, 'rate': translate.getCurrentLang() === 'ar'}">3.5</span></li>
-                    <li class="list-group-item clearfix">
-                        <span>Ahmed</span><span [ngClass]="{'badge': true, 'rate': translate.getCurrentLang() === 'ar'}">3.5</span></li>
-                    <li class="list-group-item clearfix">
-                        <span>Ahmed</span><span [ngClass]="{'badge': true, 'rate': translate.getCurrentLang() === 'ar'}">3.5</span></li>
-                </ul>
+            <div class="card">
+                <div class="card-content">
+                    <span class="card-title">{{ category | translate }}</span>
+
+                    <ul class="collection">
+                        <li class="collection-item">
+                            <span>Ahmed</span><span data-badge-caption="" [ngClass]="{'new': true, 'badge': true, 'rate': translate.getCurrentLang() === 'ar'}">3.5</span></li>
+                        <li class="collection-item">
+                            <span>Ahmed</span><span data-badge-caption="" [ngClass]="{'new': true, 'badge': true, 'rate': translate.getCurrentLang() === 'ar'}">3.5</span></li>
+                        <li class="collection-item">
+                            <span>Ahmed</span><span data-badge-caption="" [ngClass]="{'new': true, 'badge': true, 'rate': translate.getCurrentLang() === 'ar'}">3.5</span></li>
+                        <li class="collection-item">
+                            <span>Ahmed</span><span data-badge-caption="" [ngClass]="{'new': true, 'badge': true, 'rate': translate.getCurrentLang() === 'ar'}">3.5</span></li>
+                        <li class="collection-item">
+                            <span>Ahmed</span><span data-badge-caption="" [ngClass]="{'new': true, 'badge': true, 'rate': translate.getCurrentLang() === 'ar'}">3.5</span></li>
+                    </ul>
+
+                </div>
             </div>
         </div>
 

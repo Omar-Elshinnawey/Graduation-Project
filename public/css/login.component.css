@@ -21,8 +21,24 @@
     margin: 0 auto;
 }
 
-.control-label {
+input[type="text"]:focus:not([readonly]),
+input[type="password"]:focus:not([readonly]) {
+    border-color: #86194c;
+    box-shadow: 0 1px 0 0 #86194c;
+}
+
+input[type="text"]:not([readonly]),
+input[type="password"]:not([readonly]),
+input[type="text"]:not([readonly])+label,
+input[type="password"]:not([readonly])+label,
+input[type="text"]:focus:not([readonly])+label,
+input[type="password"]:focus:not([readonly])+label {
     color: #86194c;
+}
+
+.input-field label.right {
+    left: inherit;
+    right: 0;
 }
 
 @media (min-width: 768px) and (max-width: 991px) {

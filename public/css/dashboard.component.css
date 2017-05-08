@@ -4,62 +4,64 @@
     overflow: hidden;
 }
 
-.panel-body table td,
-.panel-body table th {
-    border: none;
-}
-
 .rate {
     float: left;
 }
 
-.list-group,
-.panel {
-    padding: 0;
-}
-
-.panel {
-    border-color: #86194c;
-}
-
-.panel-heading {
+.card {
     background-color: #86194c;
-    border-color: #86194c;
+    color: white;
 }
 
-.panel-body {
+.card-title {
+    font-weight: bolder;
+}
+
+.collection {
+    padding: 0;
+    border-color: #86194c;
     background-color: #9e466f;
 }
 
-.list-group-item {
+.collection-item {
     word-wrap: break-word;
     border: none;
     background-color: transparent;
     color: white;
 }
 
-.badge {
+span.badge.new {
     background-color: white;
     color: #86194c;
+    margin: 0;
 }
 
-@media (min-width: 768px) and (max-width: 991px) {
-    .col-sm-5 {
+@media (min-width: 601px) and (max-width: 767px) {
+    .col.m5 {
+        width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 992px) {
+    .col.m5 {
+        width: 41.6666666667%;
         margin-left: 4%;
         margin-right: 4%;
     }
 }
 
-@media (min-width: 992px) and (max-width: 1199px) {
-    .col-md-3 {
-        margin-left: 4.1666%;
-        margin-right: 4.1666%;
+@media (min-width: 993px) and (max-width: 1200px) {
+    .col.l5 {
+        margin-left: 4%;
+        margin-right: 4%;
     }
 }
 
-@media (min-width: 1200px) {
-    .col-md-3 {
-        margin-left: 1.6%;
-        margin-right: 1.6%;
+@media (min-width: 1201px) {
+    .col.xl5 {
+        margin-left: 4%;
+        margin-right: 4%;
     }
 }
