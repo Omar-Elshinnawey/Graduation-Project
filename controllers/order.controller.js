@@ -1,5 +1,7 @@
 const orderModel = require('../models/order.model'),
+    offerModel = require('../models/offer.model'),
     ORDER_STATE = require('../constants/order-state.constant'),
+    OFFER_STATE = require('../constants/offer-state.constant'),
     CATEGORIES = require('../constants/category.constant'),
     ERRORS = require('../constants/error.constant'),
     Validator = require('../controllers/validator.controller'),
@@ -85,7 +87,40 @@ OrderController.prototype.getOrdersForCustomer = function(customerUsername) {
             return;
         }
 
-        orderModel.find({ customerUsername: customerUsername }, 'title _id state')
+        orderModel.aggregate()
+            .match({ customerUsername: customerUsername })
+            .project('title _id state')
+            .lookup({
+                "from": offerModel.collection.name,
+                "localField": "_id",
+                "foreignField": "orderId",
+                "as": "offer"
+            })
+            .project({
+                _id: "$_id",
+                title: "$title",
+                state: "$state",
+                offer: {
+                    "$filter": {
+                        "input": "$offer",
+                        "as": "item",
+                        "cond": { "$and": [{ "$gte": ["$$item.state", OFFER_STATE.ACCEPTED] }, { "$eq": ["$state", ORDER_STATE.CLOSED] }] }
+                    }
+                }
+            })
+            .unwind({
+                "path": '$offer',
+                "preserveNullAndEmptyArrays": true
+            })
+            .project({
+                _id: "$_id",
+                title: "$title",
+                state: "$state",
+                offer: {
+                    "_id": "$offer._id",
+                    "state": "$offer.state"
+                }
+            })
             .then((result) => resolve(result))
             .catch((err) => reject(ERRORS.UNKOWN));
     });
@@ -175,7 +210,7 @@ OrderController.prototype.getOrdersInCategory = function(Category) {
             return;
         }
 
-        orderModel.find({ Category: Category },
+        orderModel.find({ Category: Category, state: { "$ne": ORDER_STATE.CLOSED } },
                 'title _id state')
             .then((result) => resolve(result))
             .catch((err) => reject(ERRORS.UNKOWN));

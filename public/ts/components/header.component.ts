@@ -14,7 +14,10 @@ export class HeaderComponent{
 
     sideNav = new EventEmitter<string|MaterializeAction>();
 
-    constructor(private router: Router, public header: HeaderService, public translate: TranslationService){}
+    
+
+    constructor(private router: Router, public header: HeaderService, public translate: TranslationService){
+    }
 
     changeLang(lang: string){
         this.translate.changeLang(lang);

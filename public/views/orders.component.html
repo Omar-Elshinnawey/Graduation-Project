@@ -1,0 +1,13 @@
+<div class="input-field">
+    <select materialize="material_select" [materializeSelectOptions]="categories|translate">
+        <option value="" disabled selected>Choose a category</option>
+        <option *ngFor="let category of categories; let i = index" value="index">{{category | translate}}</option>    
+    </select>
+</div>
+
+<table class="responsive-table">
+    <tbody>
+        <th></th>
+        <th></th>
+    </tbody>
+</table>

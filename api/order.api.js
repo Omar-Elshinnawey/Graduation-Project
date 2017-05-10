@@ -54,12 +54,19 @@ module.exports = function orderRouter(app) {
      * @apiSuccess {String} orders._id The order id
      * @apiSuccess {String} orders.title The order's title
      * @apiSuccess {number=0,1} orders.state The order's state
+     * @apiSuccess {Object} [orders.offer]
+     * @apiSuccess {String} orders.offer._id ID of accepted, delivered or on route offer
+     * @apiSuccess {number=2,3,4} orders.offer.state The state of accepted, delivered or on route offer
      * @apiSuccessExample {json} Success
      *  HTTP/1.1 200 OK
      *  [{
      *      "_id": "12355",
      *      "title": "order title",
-     *      "state": 1
+     *      "state": 1,
+     *      "offer":{
+     *          "_id": "accepted, delivered or on route offer id",
+     *          "state": 2
+     *      }
      * }]
      * @apiError (Error 500) {String} code The error code
      * @apiError (Error 500) {String} message The error message
