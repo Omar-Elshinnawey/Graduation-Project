@@ -3,7 +3,8 @@ import { Router } from '@angular/router';
 
 import {HeaderService} from '../services/header.service';
 import {TranslationService} from '../services/translate.service';
-import {MaterializeAction} from 'angular2-materialize/dist/index'
+import {AuthService} from '../services/auth.service';
+import {MaterializeAction} from 'angular2-materialize/dist/index';
 
 @Component({
     selector: 'nav-bar',
@@ -16,18 +17,21 @@ export class HeaderComponent{
 
     
 
-    constructor(private router: Router, public header: HeaderService, public translate: TranslationService){
+    constructor(private router: Router, 
+                public header: HeaderService, 
+                public translate: TranslationService,
+                private auth: AuthService){
     }
 
     changeLang(lang: string){
+        this.closeSideNav();        
         this.translate.changeLang(lang);
-        this.closeSideNav();
     }
 
     logout(){
-        localStorage.removeItem('currentUser');
+        this.closeSideNav();        
+        this.auth.logout().subscribe();
         this.router.navigate(['']);
-        this.closeSideNav();
     }
 
     closeSideNav(){

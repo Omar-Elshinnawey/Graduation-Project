@@ -1,5 +1,6 @@
 const passport = require('passport'),
     ERRORS = require('../constants/error.constant'),
+    ROLES = require('../constants/role.constant'),
     middlewares = require('../middlewares/auth.middlewar'),
     User = require('../models/user.model');
 
@@ -111,7 +112,8 @@ module.exports = function authApi(app, authController) {
      * @apiDescription
      * Change password of the user
      * @apiParam {String} username
-     * @apiParam {String} password
+     * @apiParam {String} password The old password
+     * @apiParam {String} newPassword The new password
      * @apiSuccess {String} username
      * @apiSuccess {number=0,1,2,3} role The role of the user
      * @apiSuccess {String} email The email of the user
@@ -233,5 +235,13 @@ module.exports = function authApi(app, authController) {
         authController.getInformation(req.params.username)
             .then((information) => res.send(information))
             .catch((err) => res.status(500).send(err));
+    });
+
+    app.get('/auth/isAuth', function(req, res) {
+
+        if (req.isAuthenticated() && req.user.role === ROLES.ADMIN)
+            res.send(true);
+        else
+            res.send(false);
     });
 }

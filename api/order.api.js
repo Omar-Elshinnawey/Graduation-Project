@@ -154,12 +154,14 @@ module.exports = function orderRouter(app) {
      * @apiSuccess {String} orders._id The order id
      * @apiSuccess {String} orders.title The order's title
      * @apiSuccess {number=0,1} orders.state The order's state
+     * @apiSuccess {String} orders.customerUsername The name of the customer who created the order 
      * @apiSuccessExample {json} Success
      *  HTTP/1.1 200 OK
      *  [{
      *      "_id": "12355",
      *      "title": "order title",
-     *      "state": 1
+     *      "state": 1,
+     *      "customerUsername": "customer user name"
      * }]
      * @apiError (Error 500) {String} code The error code
      * @apiError (Error 500) {String} message The error message
@@ -220,6 +222,7 @@ module.exports = function orderRouter(app) {
      * @apiSuccess {String} description The order discription
      * @apiSuccess {number=0,1,2,3,4} Category The category of the order
      * @apiSuccess {String} picture The order picture
+     * @apiSuccess {String} customerUsername The name of the customer who created the order 
      * 
      * @apiSuccessExample {json} Success
      *  HTTP/1.1 200 OK
@@ -227,6 +230,7 @@ module.exports = function orderRouter(app) {
      *      "_id": "12355",
      *      "title": "order title",
      *      "state": 1,
+     *      "customerUsername": "customer user name",
      *      "Category": 2,
      *      "description": "order description",
      *      "picture": "image url"

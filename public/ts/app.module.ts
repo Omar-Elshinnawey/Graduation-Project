@@ -5,7 +5,7 @@ import { RouterModule} from '@angular/router';
 import {TranslateModule, TranslateLoader} from '@ngx-translate/core';
 import {TranslateHttpLoader} from '@ngx-translate/http-loader';
 import {MaterializeModule} from 'angular2-materialize/dist/index';
-import {HttpModule, Http} from '@angular/http';
+import {HttpModule, JsonpModule, Http} from '@angular/http';
 
 import { LoginComponent }  from './components/login.component';
 import { DashboardComponent } from './components/dashboard.component';
@@ -15,6 +15,9 @@ import {OrdersComponent} from './components/orders.component';
 
 import {HeaderService} from './services/header.service';
 import {TranslationService} from './services/translate.service';
+import {AuthService} from './services/auth.service';
+import {AuthGuard} from './services/auth-guard.service';
+import {OrderService} from './services/order.service';
 
 import {AppRoutingModule} from './app-routing.module';
 
@@ -29,6 +32,7 @@ export function createTranslateLoader(http: Http){
                   MaterializeModule,
                   AppRoutingModule,
                   HttpModule,
+                  JsonpModule,
                   TranslateModule.forRoot({
                     loader:{
                       provide: TranslateLoader,
@@ -45,7 +49,10 @@ export function createTranslateLoader(http: Http){
   bootstrap:    [ AppComponent ],
   providers:    [
                   HeaderService,
-                  TranslationService                  
+                  TranslationService,
+                  AuthService,
+                  AuthGuard,
+                  OrderService             
                 ]
 })
 

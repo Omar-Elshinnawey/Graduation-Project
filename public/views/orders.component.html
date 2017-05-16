@@ -1,13 +1,26 @@
 <div class="input-field">
-    <select materialize="material_select" [materializeSelectOptions]="categories|translate">
+    <select materialize="material_select" [materializeSelectOptions]="categories|translate" (change)="onchange($event.target.value)">
         <option value="" disabled selected>Choose a category</option>
-        <option *ngFor="let category of categories; let i = index" value="index">{{category | translate}}</option>    
+        <option *ngFor="let category of categories; let i = index" [value]="i">{{category | translate}}</option>    
     </select>
 </div>
 
-<table class="responsive-table">
+<table *ngIf="orders.length > 0; else message" class="responsive-table">
+    <thead>
+        <th>Order Title</th>
+        <th>Customer Username</th>
+    </thead>
+
     <tbody>
-        <th></th>
-        <th></th>
+        <tr *ngFor="let order of orders">
+            <td>{{order.title}}</td>
+            <td>{{order.customerUsername}}</td>
+        </tr>
     </tbody>
 </table>
+
+<ng-template #message>
+    <div>
+        <h3>No Orders in this category!</h3>
+    </div>
+</ng-template>

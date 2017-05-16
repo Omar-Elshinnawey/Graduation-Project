@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import {TranslationService} from '../services/translate.service';
 
 import {HeaderService} from '../services/header.service';
+import {AuthService} from '../services/auth.service';
 
 @Component({
     selector: 'login',
@@ -11,12 +12,17 @@ import {HeaderService} from '../services/header.service';
 })
 export class LoginComponent implements OnInit{
 
-    constructor(private router: Router, public header: HeaderService, public translate: TranslationService){}
+    constructor(private router: Router, 
+                public header: HeaderService, 
+                public translate: TranslationService,
+                private auth: AuthService){}
 
     model = {
         username: '',
         password: ''
     }
+
+    error: string;
 
     ngOnInit(){
         this.header.hide();
@@ -25,8 +31,16 @@ export class LoginComponent implements OnInit{
     }
 
     onsubmit(){
-        console.log(this.model.username+'\n'+this.model.password);
-        localStorage.setItem('currentUser', this.model.username);
-        this.router.navigate(['/dashboard']);
+        this.auth.login(this.model.username, this.model.password)
+        .subscribe(
+            (user) => {
+                localStorage.setItem('currentUser', user.username)
+                this.router.navigate(['/dashboard']);
+        },
+            (err) => {
+                this.error = err;
+                console.log(this.error);
+            }
+        );
     }
 }

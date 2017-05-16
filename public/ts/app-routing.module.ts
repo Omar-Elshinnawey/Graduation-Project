@@ -5,11 +5,13 @@ import {LoginComponent} from './components/login.component';
 import {DashboardComponent} from './components/dashboard.component';
 import {OrdersComponent} from './components/orders.component';
 
+import {AuthGuard} from './services/auth-guard.service';
+
 const routes: Routes = [
-    {path: '', redirectTo: '/login', pathMatch: 'full'},
-    { path: 'dashboard', component: DashboardComponent},
+    { path: 'dashboard', component: DashboardComponent, canActivate:[AuthGuard]},
     { path: 'login' , component: LoginComponent},
-    { path: 'orders', component: OrdersComponent}
+    { path: 'orders', component: OrdersComponent, canActivate:[AuthGuard]},
+    {path: '', redirectTo: '/login', pathMatch: 'full'}    
 ]
 
 @NgModule({

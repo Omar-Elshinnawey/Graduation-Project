@@ -211,7 +211,7 @@ OrderController.prototype.getOrdersInCategory = function(Category) {
         }
 
         orderModel.find({ Category: Category, state: { "$ne": ORDER_STATE.CLOSED } },
-                'title _id state')
+                'title _id state customerUsername')
             .then((result) => resolve(result))
             .catch((err) => reject(ERRORS.UNKOWN));
     });
