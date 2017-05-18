@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import {TranslationService} from '../services/translate.service';
 
 import {HeaderService} from '../services/header.service';
 import {AuthService} from '../services/auth.service';
+import {ToastService} from '../services/toast.service';
 
 @Component({
     selector: 'login',
@@ -15,14 +16,13 @@ export class LoginComponent implements OnInit{
     constructor(private router: Router, 
                 public header: HeaderService, 
                 public translate: TranslationService,
-                private auth: AuthService){}
+                private auth: AuthService,
+                public toast: ToastService){}
 
     model = {
         username: '',
         password: ''
     }
-
-    error: string;
 
     ngOnInit(){
         this.header.hide();
@@ -38,8 +38,7 @@ export class LoginComponent implements OnInit{
                 this.router.navigate(['/dashboard']);
         },
             (err) => {
-                this.error = err;
-                console.log(this.error);
+                this.toast.create(err);
             }
         );
     }

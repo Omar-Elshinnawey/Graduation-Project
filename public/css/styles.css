@@ -8,6 +8,7 @@ body {
 
 body {
     background: #fffdf7;
+    position: relative;
 }
 
 .loading {

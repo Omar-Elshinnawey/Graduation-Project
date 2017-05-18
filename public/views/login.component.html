@@ -1,22 +1,25 @@
-<div class="langChange">
-    <button type="button" (click)="translate.changeLang('en')" class="btn btn-primary">English</button>
-    <button type="button" (click)="translate.changeLang('ar')" class="btn btn-primary">عربي</button>
-</div>
+<div class="login-container">
+    <div class="login" [dir]="translate.dir">
 
-<div class="login" [dir]="translate.dir">
+        <img class="logo" src="/assets/imgs/dakakeen.png" alt="Dakakeen">
 
-    <img class="logo" src="/assets/imgs/dakakeen.png" alt="Dakakeen">
-    <form #loginForm="ngForm" (ngSubmit)="onsubmit()">
-        <div class="input-field">
-            <input type="text" name="username" id="username" class="form-control" required [(ngModel)]="model.username">
-            <label for="username" [ngClass]="{'right': translate.getCurrentLang() === 'ar'}">{{"USERNAME" | translate}}</label>
-        </div>
+        <form #loginForm="ngForm" (ngSubmit)="onsubmit()">
+            <div class="input-field">
+                <input type="text" name="username" id="username" class="form-control" required [(ngModel)]="model.username">
+                <label for="username" [ngClass]="{'right': translate.getCurrentLang() === 'ar'}">{{"USERNAME" | translate}}</label>
+            </div>
 
-        <div class="input-field">
-            <input type="password" name="password" id="password" class="form-control" required [(ngModel)]="model.password">
-            <label for="password" [ngClass]="{ 'right': translate.getCurrentLang()==='ar' } ">{{"PASSWORD" | translate}}</label>
-        </div>
+            <div class="input-field">
+                <input type="password" name="password" id="password" class="form-control" required [(ngModel)]="model.password">
+                <label for="password" [ngClass]="{ 'right': translate.getCurrentLang()==='ar' } ">{{"PASSWORD" | translate}}</label>
+            </div>
 
-        <input type="submit" value="{{ 'LOGIN' | translate}}" class="btn btn-primary btn-block" [disabled]="!loginForm.form.valid">
-    </form>
+            <input type="submit" value="{{ 'LOGIN' | translate}}" class="btn btn-primary btn-block" [disabled]="!loginForm.form.valid">
+        </form>
+    </div>
+
+    <div class="langChange">
+        <button type="button" (click)="translate.changeLang('en')" class="btn btn-primary">English</button>
+        <button type="button" (click)="translate.changeLang('ar')" class="btn btn-primary">عربي</button>
+    </div>
 </div>

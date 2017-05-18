@@ -24,11 +24,8 @@ var config = {
 
     plugins: [
         new webpack.ProvidePlugin({
-            $: "jquery",
-            jQuery: "jquery",
             "window.jQuery": "jquery",
-            Hammer: "hammerjs/hammer",
-            Materialize: "materialize-css"
+            Hammer: "hammerjs/hammer"
         })
     ]
 }

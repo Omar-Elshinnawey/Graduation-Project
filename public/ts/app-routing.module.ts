@@ -8,8 +8,9 @@ import {OrdersComponent} from './components/orders.component';
 import {AuthGuard} from './services/auth-guard.service';
 
 const routes: Routes = [
+    { path: 'login' , component: LoginComponent},    
+    { path: 'login/:error' , component: LoginComponent},        
     { path: 'dashboard', component: DashboardComponent, canActivate:[AuthGuard]},
-    { path: 'login' , component: LoginComponent},
     { path: 'orders', component: OrdersComponent, canActivate:[AuthGuard]},
     {path: '', redirectTo: '/login', pathMatch: 'full'}    
 ]

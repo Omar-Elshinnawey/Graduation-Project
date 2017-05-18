@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule} from '@angular/router';
 import {TranslateModule, TranslateLoader} from '@ngx-translate/core';
 import {TranslateHttpLoader} from '@ngx-translate/http-loader';
+import 'materialize-css';
 import {MaterializeModule} from 'angular2-materialize/dist/index';
 import {HttpModule, JsonpModule, Http} from '@angular/http';
 
@@ -18,6 +19,7 @@ import {TranslationService} from './services/translate.service';
 import {AuthService} from './services/auth.service';
 import {AuthGuard} from './services/auth-guard.service';
 import {OrderService} from './services/order.service';
+import {ToastService} from './services/toast.service';
 
 import {AppRoutingModule} from './app-routing.module';
 
@@ -52,7 +54,8 @@ export function createTranslateLoader(http: Http){
                   TranslationService,
                   AuthService,
                   AuthGuard,
-                  OrderService             
+                  OrderService,
+                  ToastService           
                 ]
 })
 

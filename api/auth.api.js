@@ -239,9 +239,14 @@ module.exports = function authApi(app, authController) {
 
     app.get('/auth/isAuth', function(req, res) {
 
-        if (req.isAuthenticated() && req.user.role === ROLES.ADMIN)
-            res.send(true);
-        else
-            res.send(false);
+        if (req.isAuthenticated()) {
+            if (req.user.role === ROLES.ADMIN)
+                res.send(true);
+            else
+                res.status(401).send(ERRORS.AUTH.NOT_AUTHERIZED);
+        } else {
+            res.status(401).send(ERRORS.AUTH.NOT_AUTHENTICATED);
+        }
+
     });
 }

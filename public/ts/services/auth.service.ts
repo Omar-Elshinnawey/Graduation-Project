@@ -35,7 +35,8 @@ export class AuthService{
 
     isLoggedIn(){
         return this.http.get(this.url+'/isAuth')
-        .map(res => {return res.text() === 'true'});
+        .map((res:Response) => {return res.text()})
+        .catch((err:Response) => { return Observable.throw(err.text()); });
     }
     
 }
