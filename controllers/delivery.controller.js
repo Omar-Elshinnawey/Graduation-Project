@@ -4,7 +4,8 @@ const Offer = require('../models/offer.model'),
     Validator = require('./validator.controller'),
     OFFER_STATES = require('../constants/offer-state.constant'),
     ERRORS = require('../constants/error.constant'),
-    Promise = require('bluebird');
+    Promise = require('bluebird'),
+    offerModel = require('../models/offer.model');
 
 function Delivery() {
     this.validator = new Validator();
@@ -88,9 +89,17 @@ Delivery.prototype.updateState = function(offerId) {
 Delivery.prototype.getDeliveries = function() {
 
     return new Promise(function(resolve, reject) {
-
-        delivery.find()
-            .select('fromAddress toAddress expectedDate')
+        delivery.aggregate()
+            .unwind('offerId')
+            .lookup({
+                "from": offerModel.collection.name,
+                "localField": 'offerId',
+                "foreignField": '_id',
+                "as": 'offerId'
+            })
+            .unwind('offerId')
+            .match({ 'offerId.state': { $ne: OFFER_STATES.DELIVERED } })
+            .project('_id fromAddress toAddress offerId._id expectedDate')
             .then((result) => resolve(result))
             .catch((err) => reject(ERRORS.UNKOWN));
     });

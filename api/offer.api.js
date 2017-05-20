@@ -574,7 +574,8 @@ module.exports = function offerRouter(app) {
      *      "_id": "delivery_id"
      *      "fromAddress": "provider address",
      *      "toAddress": "customer address",
-     *      "expectedDate": "5/20/2017"
+     *      "expectedDate": "5/20/2017",
+     *      "offerId": {"_id": "offerid"}
      *  }]
      * @apiError (Error 500) {String} code The error code
      * @apiError (Error 500) {String} message The error message

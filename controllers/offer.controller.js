@@ -332,7 +332,9 @@ OfferController.prototype.rateOffer = function(customerUsername, offerId, review
             .populate('orderId', 'customerUsername')
             .then((result) => {
 
-                if (result && result.length > 0 && result.state === OFFER_STATE.DELIVERED)
+                if (!result || result.length === 0 || result.state !== OFFER_STATE.DELIVERED)
+                    reject(ERRORS.OFFER.INVALID_RATING);
+                else {
                     if (result.orderId[0].customerUsername !== customerUsername)
                         reject(ERRORS.OFFER.ORDER_DOESNOT_EXIST);
                     else {
@@ -342,8 +344,7 @@ OfferController.prototype.rateOffer = function(customerUsername, offerId, review
 
                         result.save().then(resolve('Success'));
                     }
-                else
-                    reject(ERRORS.OFFER.INVALID_RATING);
+                }
             })
             .catch((err) => reject(ERRORS.UNKOWN));
     });
