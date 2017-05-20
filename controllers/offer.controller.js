@@ -36,7 +36,7 @@ OfferController.prototype.createOffer = function(providerUsername, orderId, pric
             return;
         }
 
-        if (!_self.validator.validateEmptyOrWhiteSpace(price) || isNaN(price) || price < 0) {
+        if (!_self.validator.validateEmptyOrWhiteSpace(price) || isNaN(price) || price <= 0) {
             reject(ERRORS.OFFER.INVALID_PRICE);
             return;
         }
