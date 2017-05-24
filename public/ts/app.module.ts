@@ -8,18 +8,9 @@ import 'materialize-css';
 import {MaterializeModule} from 'angular2-materialize/dist/index';
 import {HttpModule, JsonpModule, Http} from '@angular/http';
 
-import { LoginComponent }  from './components/login.component';
-import { DashboardComponent } from './components/dashboard.component';
-import { AppComponent } from './components/app.component';
-import {HeaderComponent} from './components/header.component';
-import {OrdersComponent} from './components/orders.component';
+import * as components from './components';
 
-import {HeaderService} from './services/header.service';
-import {TranslationService} from './services/translate.service';
-import {AuthService} from './services/auth.service';
-import {AuthGuard} from './services/auth-guard.service';
-import {OrderService} from './services/order.service';
-import {ToastService} from './services/toast.service';
+import * as services from './services';
 
 import {AppRoutingModule} from './app-routing.module';
 
@@ -43,19 +34,19 @@ export function createTranslateLoader(http: Http){
                     }
                   })
                   ],
-  declarations: [ LoginComponent,
-                  DashboardComponent,
-                  AppComponent,
-                  HeaderComponent,
-                  OrdersComponent],
-  bootstrap:    [ AppComponent ],
+  declarations: [ components.LoginComponent,
+                  components.DashboardComponent,
+                  components.AppComponent,
+                  components.HeaderComponent,
+                  components.OrdersComponent],
+  bootstrap:    [ components.AppComponent ],
   providers:    [
-                  HeaderService,
-                  TranslationService,
-                  AuthService,
-                  AuthGuard,
-                  OrderService,
-                  ToastService           
+                  services.HeaderService,
+                  services.TranslationService,
+                  services.AuthService,
+                  services.AuthGuard,
+                  services.OrderService,
+                  services.ToastService           
                 ]
 })
 

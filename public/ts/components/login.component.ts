@@ -1,10 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import {TranslationService} from '../services/translate.service';
 
-import {HeaderService} from '../services/header.service';
-import {AuthService} from '../services/auth.service';
-import {ToastService} from '../services/toast.service';
+import {HeaderService, AuthService, ToastService, TranslationService} from '../services';
 
 @Component({
     selector: 'login',

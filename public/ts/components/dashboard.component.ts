@@ -1,10 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
-import {HeaderService} from '../services/header.service';
-import {TranslationService} from '../services/translate.service';
+import {HeaderService, TranslationService} from '../services';
 
-import {CATEGORIES} from '../view models/categories';
+import {CATEGORIES} from '../view models';
 
 @Component({
     selector: 'dashboard',

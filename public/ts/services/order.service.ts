@@ -3,7 +3,7 @@ import{Http, Response} from '@angular/http';
 import {Router} from '@angular/router';
 import {Observable} from 'rxjs/Rx';
 
-import {Order} from '../view models/order';
+import {Order} from '../view models';
 
 
 @Injectable()

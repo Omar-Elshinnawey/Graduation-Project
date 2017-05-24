@@ -1,9 +1,7 @@
 import { Component, EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
 
-import {HeaderService} from '../services/header.service';
-import {TranslationService} from '../services/translate.service';
-import {AuthService} from '../services/auth.service';
+import {HeaderService, TranslationService, AuthService} from '../services';
 import {MaterializeAction} from 'angular2-materialize/dist/index';
 
 @Component({

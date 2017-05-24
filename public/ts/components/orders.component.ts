@@ -1,14 +1,10 @@
 import { Component, OnInit, EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
 import {MaterializeAction} from 'angular2-materialize/dist/index';
-import {LangChangeEvent} from '@ngx-translate/core';
 
-import {HeaderService} from '../services/header.service';
-import {TranslationService} from '../services/translate.service';
-import {OrderService} from '../services/order.service';
+import {HeaderService, TranslationService, OrderService} from '../services';
 
-import {CATEGORIES} from '../view models/categories';
-import {Order} from '../view models/order';
+import {CATEGORIES, Order} from '../view models';
 
 @Component({
     selector: 'dashboard',

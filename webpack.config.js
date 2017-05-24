@@ -1,5 +1,6 @@
 const webpack = require('webpack'),
-    path = require('path');
+    path = require('path'),
+    CircularDependancyPlugin = require('circular-dependency-plugin');
 var config = {
 
     context: __dirname + '/public',
@@ -9,6 +10,8 @@ var config = {
     output: {
         filename: './public/js/bundle.js'
     },
+
+    devtool: 'source-map',
 
     resolve: {
         extensions: ['.ts', '.tsx', '.js']
@@ -26,7 +29,15 @@ var config = {
         new webpack.ProvidePlugin({
             "window.jQuery": "jquery",
             Hammer: "hammerjs/hammer"
-        })
+        }),
+        new CircularDependancyPlugin({
+            exclude: /a\.js|node_modules/,
+            failOnError: true
+        }),
+        new webpack.ContextReplacementPlugin(
+            /angular(\\|\/)core(\\|\/)@angular/,
+            path.resolve(__dirname, './public/ts'), {}
+        )
     ]
 }
 
