@@ -6,7 +6,7 @@ import {TranslateModule, TranslateLoader} from '@ngx-translate/core';
 import {TranslateHttpLoader} from '@ngx-translate/http-loader';
 import 'materialize-css';
 import {MaterializeModule} from 'angular2-materialize/dist/index';
-import {HttpModule, JsonpModule, Http} from '@angular/http';
+import {HttpModule, Http} from '@angular/http';
 
 import * as components from './components';
 
@@ -25,7 +25,6 @@ export function createTranslateLoader(http: Http){
                   MaterializeModule,
                   AppRoutingModule,
                   HttpModule,
-                  JsonpModule,
                   TranslateModule.forRoot({
                     loader:{
                       provide: TranslateLoader,

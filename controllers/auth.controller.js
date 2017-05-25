@@ -17,7 +17,10 @@ AuthController.prototype.setup = function(app) {
     app.use(cookieSession({
         keys: ['abdo took a taxi to the downtown and ate a turkey'],
         name: 'session',
-        maxAge: 24 * 60 * 60 * 1000
+        maxAge: 24 * 60 * 60 * 1000,
+        /*httpOnly: true,
+        secure: true,*/
+        domain: 'localhost'
     }));
 
     app.use(passport.initialize());

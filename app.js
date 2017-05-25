@@ -1,4 +1,5 @@
 const express = require('express'),
+    helmet = require('helmet'),
     bodyparser = require('body-parser'),
     mongoose = require('mongoose'),
     AuthController = require('./controllers/auth.controller'),
@@ -15,6 +16,19 @@ app.use(bodyparser.json());
 app.use(bodyparser.urlencoded({ extended: true }));
 
 auth.setup(app);
+
+/*security settings */
+
+app.use(helmet());
+//uncomment when deploying
+/*app.all('*', ensureSecure)
+
+function ensureSecure(req, res, next) {
+    if (req.headers["x-forwarded-proto"] === 'https')
+        return next();
+
+    res.redirect('https://' + req.hostname + req.url);
+}*/
 
 var port = process.env.PORT || 3000;
 

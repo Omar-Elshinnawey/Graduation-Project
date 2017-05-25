@@ -5,10 +5,13 @@ var config = {
 
     context: __dirname + '/public',
 
-    entry: './ts/main.ts',
+    entry: {
+        bundle: './ts/main.ts',
+        vendor: './ts/vendor.ts'
+    },
 
     output: {
-        filename: './public/js/bundle.js'
+        filename: './public/js/[name].js'
     },
 
     devtool: 'source-map',
@@ -37,7 +40,13 @@ var config = {
         new webpack.ContextReplacementPlugin(
             /angular(\\|\/)core(\\|\/)@angular/,
             path.resolve(__dirname, './public/ts'), {}
-        )
+        ),
+        new webpack.optimize.UglifyJsPlugin({
+            sourceMap: true,
+        }),
+        new webpack.optimize.CommonsChunkPlugin({
+            name: ['bundle', 'vendor']
+        })
     ]
 }
 

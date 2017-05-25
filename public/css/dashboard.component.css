@@ -1,10 +1,23 @@
-.ratings {
+.row {
     margin: 10px auto;
     padding: 10px 0;
     overflow: hidden;
+    text-align: center;
 }
 
-.rate {
+.row>div>a.d-icon {
+    display: inline-block;
+    text-align: center;
+    color: #86194c;
+    padding: 5px 0;
+}
+
+.row>div>a.d-icon>i {
+    display: block;
+}
+
+
+/*.rate {
     float: left;
 }
 
@@ -34,7 +47,7 @@ span.badge.new {
     background-color: white;
     color: #86194c;
     margin: 0;
-}
+}*/
 
 @media (min-width: 601px) and (max-width: 767px) {
     .col.m5 {
@@ -60,7 +73,7 @@ span.badge.new {
 }
 
 @media (min-width: 1201px) {
-    .col.xl5 {
+    .col.xl2 {
         margin-left: 4%;
         margin-right: 4%;
     }
