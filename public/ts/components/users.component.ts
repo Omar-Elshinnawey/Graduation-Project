@@ -1,4 +1,5 @@
-import { Component, OnInit} from '@angular/core';
+import { Component, OnInit, OnDestroy} from '@angular/core';
+import {Subscription} from 'rxjs/Rx';
 
 import {HeaderService, UsersService, ToastService, TranslationService} from '../services';
 
@@ -9,11 +10,12 @@ import {User, ROLES} from '../view models';
     templateUrl: '/assets/views/users.component.html',
     styleUrls:['assets/css/users.component.css']
 })
-export class UsersComponent implements OnInit{
+export class UsersComponent implements OnInit, OnDestroy{
 
     users: User[];
     ROLES = ROLES;
     params = {position: 'top', delay: 50, tooltip: 'Click to view detail'};
+    subs: Subscription[];
 
     selectedUser:User;
     action:string;
@@ -21,37 +23,47 @@ export class UsersComponent implements OnInit{
     constructor(public header: HeaderService,
                 private usersService: UsersService, 
                 public toast: ToastService,
-                public translate: TranslationService){}
+                public translate: TranslationService){
+                    this.subs = new Array<Subscription>();
+                }
 
     ngOnInit(){
         this.header.show();
 
-        this.usersService.getUsers()
+        var sub = this.usersService.getUsers()
         .subscribe(
             (users) => { this.users = users },
             (err) => { this.toast.create(err, 'danger') }
         );
+
+        this.subs.push(sub);
     }
 
     toggleBan(user: User){
-        this.usersService.toggleBan(user)
+        var sub = this.usersService.toggleBan(user)
         .subscribe(
             (result) => {user.isbanned = !user.isbanned},
             (err) => { this.toast.create(err, 'danger')}
-        )
+        );
+        this.subs.push(sub);
     }
 
     viewDetail(user: User){
-        this.usersService.getUserDetail(user)
+        var sub = this.usersService.getUserDetail(user)
         .subscribe(
             (average: number) => user.average = average,
             (err) => this.toast.create(err, 'danger')
         );
+
+        this.subs.push(sub);
     }
 
     setSelectedUser(user:User){
         this.selectedUser = user;
         this.action = user.isbanned? 'UNBAN': 'BAN';
     }
-    
+
+    ngOnDestroy(){
+        this.subs.forEach(sub => sub.unsubscribe());
+    }   
 }

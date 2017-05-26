@@ -1,5 +1,6 @@
-import { Component, EventEmitter } from '@angular/core';
+import { Component, EventEmitter, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
+import {Subscription} from 'rxjs/Rx';
 
 import {HeaderService, TranslationService, AuthService} from '../services';
 import {MaterializeAction} from 'angular2-materialize/dist/index';
@@ -9,16 +10,17 @@ import {MaterializeAction} from 'angular2-materialize/dist/index';
     templateUrl: '/assets/views/header.component.html',
     styleUrls: ['assets/css/header.component.css']
 })
-export class HeaderComponent{
+export class HeaderComponent implements OnDestroy{
 
     sideNav = new EventEmitter<string|MaterializeAction>();
 
-    
+    subs: Subscription[];
 
     constructor(private router: Router, 
                 public header: HeaderService, 
                 public translate: TranslationService,
                 private auth: AuthService){
+        this.subs = new Array<Subscription>();
     }
 
     changeLang(lang: string){
@@ -28,7 +30,7 @@ export class HeaderComponent{
 
     logout(){
         this.closeSideNav();        
-        this.auth.logout().subscribe();
+        this.subs.push(this.auth.logout().subscribe());
         this.router.navigate(['']);
     }
 
@@ -38,5 +40,9 @@ export class HeaderComponent{
 
     onresize(){
         this.closeSideNav();
+    }
+
+    ngOnDestroy(){
+        this.subs.forEach(sub => sub.unsubscribe());
     }
 }
