@@ -1,5 +1,4 @@
-import { Injectable,EventEmitter } from '@angular/core';
-import {MaterializeAction} from 'angular2-materialize/dist/index';
+import { Injectable } from '@angular/core';
 
 @Injectable()
 export class HeaderService {
