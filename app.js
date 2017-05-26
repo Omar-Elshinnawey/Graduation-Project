@@ -16,12 +16,14 @@ app.use(bodyparser.json());
 app.use(bodyparser.urlencoded({ extended: true }));
 
 auth.setup(app);
-
 /*security settings */
 
 app.use(helmet());
+
 //uncomment when deploying
-/*app.all('*', ensureSecure)
+/*app.set('trust proxy', true); <--- not sure about this TODO: Try removing it later
+
+app.all('*', ensureSecure)
 
 function ensureSecure(req, res, next) {
     if (req.headers["x-forwarded-proto"] === 'https')

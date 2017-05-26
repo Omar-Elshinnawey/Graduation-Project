@@ -18,9 +18,9 @@ AuthController.prototype.setup = function(app) {
         keys: ['abdo took a taxi to the downtown and ate a turkey'],
         name: 'session',
         maxAge: 24 * 60 * 60 * 1000,
-        /*httpOnly: true,
+        /*httpOnly: true,<-- uncomment when deploying
         secure: true,*/
-        domain: 'localhost'
+        domain: 'localhost' //<-- change to 'dakakeen.cfapps.io' when deploying
     }));
 
     app.use(passport.initialize());
