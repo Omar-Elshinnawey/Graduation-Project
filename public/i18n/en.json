@@ -16,8 +16,15 @@
     "PAINTING": "Painting",
     "ROLE": "Role",
     "BANBTN": "Ban User",
-    "UNBAN": "Unban user",
+    "UNBANBTN": "Unban user",
     "ROLE1": "Customer",
     "ROLE2": "Provider",
-    "ROLE3": "Delivery"
+    "ROLE3": "Delivery",
+    "BAN": "Ban",
+    "UNBAN": "Unban",
+    "BANALRT": "Are you sure you want to",
+    "ALRTHEAD": "Are you sure?",
+    "?": "?",
+    "Y": "Yes",
+    "C": "Cancel"
 }

@@ -15,6 +15,9 @@ export class UsersComponent implements OnInit{
     ROLES = ROLES;
     params = {position: 'top', delay: 50, tooltip: 'Click to view detail'};
 
+    selectedUser:User;
+    action:string;
+
     constructor(public header: HeaderService,
                 private usersService: UsersService, 
                 public toast: ToastService,
@@ -46,5 +49,9 @@ export class UsersComponent implements OnInit{
         );
     }
 
+    setSelectedUser(user:User){
+        this.selectedUser = user;
+        this.action = user.isbanned? 'UNBAN': 'BAN';
+    }
     
 }

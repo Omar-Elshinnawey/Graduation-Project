@@ -13,7 +13,7 @@
             <tr *ngFor="let user of users">
                 <td *ngIf="user.role !== ROLES.PROVIDER; else provider">{{user.username}}</td>
                 <td>{{'ROLE'+user.role | translate}}</td>
-                <td><button type="button" class="btn btn-floating" (click)="toggleBan(user)"><i class="material-icons">{{user.isbanned? 'do_not_disturb_off': 'do_not_disturb_on'}}</i></button></td>
+                <td><button type="button" data-target="modal1" class="btn btn-floating" (click)="setSelectedUser(user)"><i class="material-icons">{{user.isbanned? 'do_not_disturb_off': 'do_not_disturb_on'}}</i></button></td>
                 <ng-template #provider>
                     <td (click)="viewDetail(user)" materialize="tooltip" class="tooltipped" [materializeParams]="[params]">
                         <ul materialize="collapsible">
@@ -21,7 +21,6 @@
                                 <div class="collapsible-header">{{user.username}}</div>
                                 <div class="collapsible-body">Average: {{user.average}}</div>
                             </li>
-
                         </ul>
                     </td>
                 </ng-template>
@@ -33,7 +32,18 @@
 <ng-template #message>
     <tbody>
         <tr>
-            <td>No users</td>
+            <td colspan="3">No users</td>
         </tr>
     </tbody>
 </ng-template>
+
+<div *ngIf="selectedUser" materialize="modal" class="modal" id="modal1" [dir]="translate.dir">
+    <div class="modal-content">
+        <h4>{{'ALRTHEAD' | translate}}</h4>
+        <p>{{('BANALRT' | translate)+ ' ' + (action | translate) +' '+ selectedUser.username + ('?' | translate)}}</p>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="modal-action modal-close btn-flat" (click)="toggleBan(selectedUser)">{{'Y' | translate}}</button>
+        <button type="button" class="modal-action modal-close btn-flat">{{'C' | translate}}</button>
+    </div>
+</div>
