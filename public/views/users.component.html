@@ -1,0 +1,39 @@
+<div class="row" [dir]="translate.dir">
+    <h2>{{'USERS' | translate}}</h2>
+    <table class="bordered highlight centered responsive-table">
+        <thead>
+            <tr>
+                <th>{{'USERNAME' | translate}}</th>
+                <th>{{'ROLE' | translate}}</th>
+                <th>{{'BANBTN' | translate}}</th>
+            </tr>
+        </thead>
+
+        <tbody *ngIf="users; else message">
+            <tr *ngFor="let user of users">
+                <td *ngIf="user.role !== ROLES.PROVIDER; else provider">{{user.username}}</td>
+                <td>{{'ROLE'+user.role | translate}}</td>
+                <td><button type="button" class="btn btn-floating" (click)="toggleBan(user)"><i class="material-icons">{{user.isbanned? 'do_not_disturb_off': 'do_not_disturb_on'}}</i></button></td>
+                <ng-template #provider>
+                    <td (click)="viewDetail(user)" materialize="tooltip" class="tooltipped" [materializeParams]="[params]">
+                        <ul materialize="collapsible">
+                            <li>
+                                <div class="collapsible-header">{{user.username}}</div>
+                                <div class="collapsible-body">Average: {{user.average}}</div>
+                            </li>
+
+                        </ul>
+                    </td>
+                </ng-template>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<ng-template #message>
+    <tbody>
+        <tr>
+            <td>No users</td>
+        </tr>
+    </tbody>
+</ng-template>

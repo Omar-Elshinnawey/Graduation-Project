@@ -13,5 +13,11 @@
     "HANDCRAFT": "Handcraft",
     "FASHION": "Fashion",
     "ACCESSORY": "Accessory",
-    "PAINTING": "Painting"
+    "PAINTING": "Painting",
+    "ROLE": "Role",
+    "BANBTN": "Ban User",
+    "UNBAN": "Unban user",
+    "ROLE1": "Customer",
+    "ROLE2": "Provider",
+    "ROLE3": "Delivery"
 }

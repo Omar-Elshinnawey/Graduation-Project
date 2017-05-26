@@ -209,6 +209,60 @@ module.exports = function authApi(app, authController) {
     });
 
     /**
+     * @api {post} /auth/unban/:username Unban a user
+     * @apiGroup Admin functions
+     * @apiDescription
+     * Administrator unban a user
+     * @apiParam {String} username The username of the user to be banned
+     * @apiSuccessExample {String} Success
+     *  HTTP/1.1 200 OK
+     *  'Success'
+     * @apiError (Error 500) {String} code The error code
+     * @apiError (Error 500) {String} message The error message
+     * @apiErrorExample {json} Error
+     *  HTTP/1.1 500 Internal server error
+     *  {
+     *      "code": "Order/error code",
+     *      "message": "error message" 
+     *  }
+     */
+    app.post('/auth/unban/:username', middlewares.isLoggedinAdmin, function(req, res) {
+        authController.unbanUser(req.params.username)
+            .then((result) => res.send(result))
+            .catch((err) => res.status(500).send(err));
+    })
+
+    /**
+     * @api {get} /auth/users Get users
+     * @apiGroup Admin functions
+     * @apiDescription
+     * Get all users
+     * @apiSuccess {String} username The user's username
+     * @apiSuccess {Number=0,1,2,3} role The role of the user
+     * @apiSuccess {Boolean} isbanned Is the user banned? 
+     * @apiSuccessExample {String} Success
+     *  HTTP/1.1 200 OK
+     *  [{
+     *      "username": "username",
+     *      "role": 1,
+     *      "isbanned": false
+     *  }]
+     * @apiError (Error 500) {String} code The error code
+     * @apiError (Error 500) {String} message The error message
+     * @apiErrorExample {json} Error
+     *  HTTP/1.1 500 Internal server error
+     *  {
+     *      "code": "Order/error code",
+     *      "message": "error message" 
+     *  }
+     */
+    app.get('/auth/users', middlewares.isLoggedinAdmin, function(req, res) {
+        authController.getUsers()
+            .then((users) => res.send(users))
+            .catch((err) => res.status(500).send(err));
+    });
+
+    /**
      * @api {get} /providers/:username Get provider information
      * @apiGroup General
      * @apiDescription

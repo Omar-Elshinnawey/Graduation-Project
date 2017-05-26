@@ -5,7 +5,8 @@ declare var Materialize:any;
 @Injectable()
 export class ToastService{
     
-    create(text:string, duration: number = 5000, styles:string = 'rounded'){
+    create(text:string, styles:string, duration: number = 3000){
+        styles += ' rounded'
         Materialize.toast(text, duration, styles);
     }
 }

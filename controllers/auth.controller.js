@@ -133,6 +133,17 @@ AuthController.prototype.getInformation = function(providerUsername) {
     });
 }
 
+AuthController.prototype.getUsers = function() {
+    _self = this;
+
+    return new Promise(function(resolve, reject) {
+        User.find().ne('role', ROLE.ADMIN)
+            .select('username role isbanned')
+            .then((users) => resolve(users))
+            .catch((err) => (ERRORS.UNKOWN));
+    });
+}
+
 AuthController.prototype.banUser = function(username) {
 
     var _self = this;
@@ -145,10 +156,24 @@ AuthController.prototype.banUser = function(username) {
 
         User.findOneAndUpdate({ username: username }, { isbanned: true })
             .then((result) => {
-                if (result && result.length > 1)
-                    result.isbanned = true;
-                result.save()
-                    .then(resolve('Success'));
+                resolve('Success');
+            })
+            .catch((err) => reject(ERRORS.UNKOWN));
+    });
+}
+
+AuthController.prototype.unbanUser = function(username) {
+    var _self = this;
+    return new Promise(function(resolve, reject) {
+
+        if (!_self.validator.validateEmptyOrWhiteSpace(username)) {
+            reject(ERRORS.AUTH.USERNAME_MISSING);
+            return;
+        }
+
+        User.findOneAndUpdate({ username: username }, { isbanned: false })
+            .then((result) => {
+                resolve('Success');
             })
             .catch((err) => reject(ERRORS.UNKOWN));
     });

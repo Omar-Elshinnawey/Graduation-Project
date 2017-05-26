@@ -51,3 +51,7 @@ login {
 .btn:focus:hover {
     background-color: #c25975;
 }
+
+.danger {
+    background-color: #BD362F;
+}

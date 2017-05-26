@@ -22,7 +22,7 @@ export class AuthGuard implements CanActivate{
 
         }).catch((err:string) => {
 
-            this.toast.create(JSON.parse(err).message);
+            this.toast.create(JSON.parse(err).message,'danger');
             
             this.router.navigate(['/login']);
             localStorage.clear();

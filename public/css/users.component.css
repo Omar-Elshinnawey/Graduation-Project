@@ -1,0 +1,17 @@
+td>ul {
+    margin: 0;
+    padding: 0;
+}
+
+.collapsible-header {
+    border: none;
+    background-color: inherit;
+    padding: 0;
+    line-height: inherit;
+    min-height: inherit;
+}
+
+.collapsible-body {
+    padding: 0;
+    border: none;
+}

@@ -35,7 +35,7 @@ export class LoginComponent implements OnInit{
                 this.router.navigate(['/dashboard']);
         },
             (err) => {
-                this.toast.create(err);
+                this.toast.create(err,'danger');
             }
         );
     }
