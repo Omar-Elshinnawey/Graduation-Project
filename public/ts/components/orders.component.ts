@@ -1,9 +1,8 @@
-import { Component, OnInit, EventEmitter, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
-import {MaterializeAction} from 'angular2-materialize/dist/index';
 import {Subscription} from 'rxjs/Rx';
 
-import {HeaderService, TranslationService, OrderService, ToastService} from '../services';
+import {HeaderService, TranslationService, OrderService, ToastService, DatabagService} from '../services';
 
 import {CATEGORIES, Order} from '../view models';
 
@@ -15,16 +14,17 @@ import {CATEGORIES, Order} from '../view models';
 export class OrdersComponent implements OnInit, OnDestroy{
 
     categories: any;
-    selectAction = new EventEmitter<string|MaterializeAction>();
     langchangeevent: any;
     orders: Order[] = []; 
     subs: Subscription[];
+    tooltipParams = {position: 'top', tooltip: 'Click to view details', delay: 50}
    
     constructor(private router: Router, 
                 public header: HeaderService, 
                 public translate: TranslationService,
                 private orderService: OrderService,
-                public toast: ToastService){
+                public toast: ToastService,
+                private databag: DatabagService){
         this.categories = CATEGORIES;
         this.subs = new Array<Subscription>();
     }
@@ -44,6 +44,11 @@ export class OrdersComponent implements OnInit, OnDestroy{
             (err) => {this.toast.create(err, 'danger')}
         );
         this.subs.push(sub);
+    }
+
+    goToDetail(order:Order){
+        this.databag.add('selectedOrder', order);
+        this.router.navigate(['usersOrders/detail']);
     }
 
     ngOnDestroy(){

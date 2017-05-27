@@ -1,10 +1,10 @@
 export class Order{
 
-    id:string;
+    _id:string;
     title: string;
-    category: number;
+    Category: number;
     description:string;
-    pictureUrl:string;
+    picture:string;
     state: number;
     customerUsername: string;
 }

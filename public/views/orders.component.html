@@ -15,7 +15,7 @@
 
             <tbody>
                 <tr *ngFor="let order of orders">
-                    <td>{{order.title}}</td>
+                    <td materialize="tooltip" class="tooltipped" [materializeParams]="[tooltipParams]" (click)="goToDetail(order)">{{order.title}}</td>
                     <td>{{order.customerUsername}}</td>
                 </tr>
             </tbody>

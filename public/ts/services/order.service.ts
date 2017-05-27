@@ -17,11 +17,27 @@ export class OrderService {
         .catch(this.handleError);
     }
 
+    getOrderDetail(id: string):Observable<Order|string>{
+        return this.http.get(`/order/${id}`)
+        .map(this.extractOrder)
+        .catch(this.handleError);
+    }
+
+    deleteOrder(id: string):Observable<string>{
+        return this.http.get(`/order/delete/${id}`)
+        .map((res: Response) => {return res.text()})
+        .catch(this.handleError);
+    }
+
     extractOrders(res: Response): Order[]{
         return JSON.parse(res.text()) as Order[];
     }
 
-    handleError(res:Response){
+    extractOrder(res: Response): Order{
+        return JSON.parse(res.text()) as Order;
+    }
+
+    handleError(res:Response):string{
         if(res.status === 401)
             this.router.navigate(['/login']);
 

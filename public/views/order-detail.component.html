@@ -1,0 +1,34 @@
+<div class="row" [dir]="translate.dir">
+    <h2>Order Detail</h2>
+    <div *ngIf="order">
+        <div class="order-img">
+            <img *ngIf="order.picture" [src]="order.picture">
+        </div>
+        <div class="order-info">
+            <h3>{{order.title}}</h3>
+
+            <p><strong>{{('CUSTOMER' | translate) + ': '}}</strong>{{order.customerUsername}}</p>
+
+            <p><strong>{{('CATEGORY' | translate) + ': '}}</strong>{{categories[order.Category] | translate}}</p>
+
+            <p>{{order.description}}</p>
+
+            <p><strong>{{('STATE' | translate) + ': '}}</strong>{{('STATE'+ order.state) | translate}}</p>
+
+            <button type="button" class="btn red" data-target="modal1">Delete this order</button>
+        </div>
+
+        <button type="button" class="btn" (click)="goToOrders()">Back to orders</button>
+    </div>
+</div>
+
+<div materialize="modal" class="modal" id="modal1" [dir]="translate.dir">
+    <div class="modal-content">
+        <h4>{{'ALRTHEAD' | translate}}</h4>
+        <p>{{'ALRTDEL' | translate}}</p>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="modal-action modal-close btn-flat" (click)="deleteOrder()">{{'Y' | translate}}</button>
+        <button type="button" class="modal-action modal-close btn-flat">{{'C' | translate}}</button>
+    </div>
+</div>

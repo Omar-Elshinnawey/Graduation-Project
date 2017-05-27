@@ -38,7 +38,8 @@ export function createTranslateLoader(http: Http){
                   components.AppComponent,
                   components.HeaderComponent,
                   components.OrdersComponent,
-                  components.UsersComponent],
+                  components.UsersComponent,
+                  components.OrderDetailComponent],
   bootstrap:    [ components.AppComponent ],
   providers:    [
                   services.HeaderService,
@@ -47,7 +48,8 @@ export function createTranslateLoader(http: Http){
                   services.AuthGuard,
                   services.OrderService,
                   services.ToastService,
-                  services.UsersService           
+                  services.UsersService,
+                  services.DatabagService           
                 ]
 })
 

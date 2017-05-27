@@ -8,3 +8,7 @@ img {
 .row .col {
     padding: 0;
 }
+
+.tooltipped {
+    cursor: pointer;
+}
