@@ -1,26 +1,25 @@
-<div class="input-field">
-    <select materialize="material_select" [materializeSelectOptions]="categories|translate" (change)="onchange($event.target.value)">
-        <option value="" disabled selected>Choose a category</option>
-        <option *ngFor="let category of categories; let i = index" [value]="i">{{category | translate}}</option>    
-    </select>
-</div>
-
-<table *ngIf="orders.length > 0; else message" class="responsive-table">
-    <thead>
-        <th>Order Title</th>
-        <th>Customer Username</th>
-    </thead>
-
-    <tbody>
-        <tr *ngFor="let order of orders">
-            <td>{{order.title}}</td>
-            <td>{{order.customerUsername}}</td>
-        </tr>
-    </tbody>
-</table>
-
-<ng-template #message>
-    <div>
-        <h3>No Orders in this category!</h3>
+<div class="row" [dir]="translate.dir">
+    <h2>{{'ORDERS' | translate}}</h2>
+    <div *ngIf="!orders || orders.length === 0; else ordersTable">
+        <div *ngFor="let category of categories; let i = index" class="col s6 m5 l4 xl4">
+            <img [src]="'/assets/imgs/'+ i + '.png'" (click)="getOrders(i)">
+        </div>
     </div>
-</ng-template>
+
+    <ng-template #ordersTable>
+        <table class="responsive-table">
+            <thead>
+                <th>Order Title</th>
+                <th>Customer Username</th>
+            </thead>
+
+            <tbody>
+                <tr *ngFor="let order of orders">
+                    <td>{{order.title}}</td>
+                    <td>{{order.customerUsername}}</td>
+                </tr>
+            </tbody>
+        </table>
+        <button type="button" (click)="orders = null" class="btn">Back</button>
+    </ng-template>
+</div>

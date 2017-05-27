@@ -21,7 +21,7 @@ auth.setup(app);
 app.use(helmet());
 
 //uncomment when deploying
-/*app.set('trust proxy', true); <--- not sure about this TODO: Try removing it later
+/*app.set('trust proxy', true);<-- must exist
 
 app.all('*', ensureSecure)
 

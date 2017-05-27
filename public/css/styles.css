@@ -55,3 +55,7 @@ login {
 .danger {
     background-color: #BD362F;
 }
+
+.warning {
+    background-color: #f89406;
+}
