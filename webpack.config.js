@@ -7,7 +7,8 @@ var config = {
 
     entry: {
         bundle: './ts/main.ts',
-        vendor: './ts/vendor.ts'
+        vendor: './ts/vendor.ts',
+        polyfills: './ts/polyfills.ts'
     },
 
     output: {
@@ -23,7 +24,7 @@ var config = {
     module: {
         loaders: [{
             test: /\.ts?$/,
-            loader: 'ts-loader',
+            loaders: ['ts-loader', 'angular-router-loader'],
             exclude: /node_modules/
         }]
     },
@@ -45,7 +46,7 @@ var config = {
             sourceMap: true,
         }),
         new webpack.optimize.CommonsChunkPlugin({
-            name: ['bundle', 'vendor']
+            name: ['bundle', 'vendor', 'polyfills']
         })
     ]
 }

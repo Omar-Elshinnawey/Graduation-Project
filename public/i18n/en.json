@@ -32,5 +32,11 @@
     "STATE": "State",
     "STATE0": "Active",
     "STATE1": "Closed",
-    "ALRTDEL": "Are you sure you want to delete this order?"
+    "ALRTDEL": "Are you sure you want to delete this order?",
+    "REFUNDS": "Refunds",
+    "REF0": "Active",
+    "REF1": "Accepted",
+    "REF2": "Denied",
+    "REFT0": "Refund",
+    "REFT1": "Defect"
 }

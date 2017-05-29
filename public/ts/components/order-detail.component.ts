@@ -7,7 +7,7 @@ import {HeaderService, TranslationService, OrderService, ToastService, DatabagSe
 import {CATEGORIES, Order} from '../view models';
 
 @Component({
-    selector: 'dashboard',
+    selector: 'order-detail',
     templateUrl: '/assets/views/order-detail.component.html',
     styleUrls: ['assets/css/order-detail.component.css']
 })

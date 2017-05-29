@@ -6,7 +6,9 @@ const express = require('express'),
     dbConfig = require('./config/db.config'),
     orderApi = require('./api/order.api'),
     offerApi = require('./api/offer.api'),
-    authAPi = require('./api/auth.api');
+    authAPi = require('./api/auth.api'),
+    favico = require('serve-favicon'),
+    path = require('path');
 
 var app = express();
 
@@ -21,7 +23,7 @@ auth.setup(app);
 app.use(helmet());
 
 //uncomment when deploying
-/*app.set('trust proxy', true);<-- must exist
+/*app.set('trust proxy', true); //<-- must exist
 
 app.all('*', ensureSecure)
 
@@ -37,6 +39,7 @@ var port = process.env.PORT || 3000;
 app.use('/docs', express.static('apidoc'));
 app.use('/libs', express.static('node_modules'));
 app.use('/assets', express.static('public'));
+app.use(favico(path.join(__dirname, 'public', 'imgs', 'dakakeen.ico')));
 
 orderApi(app);
 offerApi(app);
@@ -46,7 +49,7 @@ app.get('*', function(req, res) {
     res.sendFile(__dirname + '/public/index.html');
 });
 
-mongoose.Promise = require('bluebird') /*global.Promise*/ ;
+mongoose.Promise = require('bluebird');
 
 mongoose.connect(dbConfig());
 

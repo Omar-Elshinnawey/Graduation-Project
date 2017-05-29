@@ -451,7 +451,7 @@ OfferController.prototype.getRefundRequests = function() {
 
     return new Promise(function(resolve, reject) {
 
-        refundModel.find().select('date type state').sort({ state: -1 })
+        refundModel.find().select('date type state reason').sort({ state: -1 })
             .then((result) => resolve(result))
             .catch((err) => reject(ERRORS.UNKOWN));
     });

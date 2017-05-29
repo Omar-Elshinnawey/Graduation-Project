@@ -2,7 +2,7 @@
 
     <div class="nav-wrapper" [dir]="translate.dir">
 
-        <a class="brand-logo center" [routerLink]="['/']">
+        <a class="brand-logo center" [routerLink]="['dashboard']">
                 {{"DAKAKEEN" | translate}}
        </a>
 
@@ -11,8 +11,8 @@
         </a>
 
         <ul [ngClass]="{'hide-on-med-and-down': true, 'left': translate.getCurrentLang() === 'en', 'right': translate.getCurrentLang() === 'ar'}">
-            <li [routerLinkActive]="['active']"><a [routerLink]="['/dashboard']">{{ "DASHBOARD" | translate}}</a></li>
-            <li [routerLinkActive]="['active']"><a [routerLink]="['/usersOrders']">{{ "ORDERS" | translate}}</a></li>
+            <li [routerLinkActive]="['active']"><a [routerLink]="['dashboard']">{{ "DASHBOARD" | translate}}</a></li>
+            <li [routerLinkActive]="['active']"><a [routerLink]="['usersOrders']">{{ "ORDERS" | translate}}</a></li>
             <li><a href="#">{{ "OFFERS" | translate}}</a></li>
         </ul>
 
@@ -29,8 +29,8 @@
         </ul>
 
         <ul id="mobile-nav" [ngClass]="{'right': translate.getCurrentLang() === 'en', 'side-nav': true}">
-            <li [routerLinkActive]="['active']"><a [routerLink]="['/dashboard']">{{ "DASHBOARD" | translate}}</a></li>
-            <li [routerLinkActive]="['active']"><a [routerLink]="['/usersOrders']">{{ "ORDERS" | translate}}</a></li>
+            <li [routerLinkActive]="['active']"><a [routerLink]="['dashboard']">{{ "DASHBOARD" | translate}}</a></li>
+            <li [routerLinkActive]="['active']"><a [routerLink]="['usersOrders']">{{ "ORDERS" | translate}}</a></li>
             <li><a href="#">{{ "OFFERS" | translate}}</a></li>
             <li>
                 <button type="button" class="btn navbar-btn" (click)="logout()">{{ "LOGOUT" | translate}}</button>

@@ -1,0 +1,22 @@
+<div class="row" [dir]="translate.dir">
+    <h2>Refunds</h2>
+    <table class="responsive-table">
+        <thead>
+            <th>Reason</th>
+            <th>Type</th>
+            <th>State</th>
+            <th>Accept</th>
+            <th>Deny</th>
+        </thead>
+
+        <tbody>
+            <tr *ngFor="let refund of refunds">
+                <td>{{refund.reason}}</td>
+                <td>{{('REFT'+refund.type) | translate}}</td>
+                <td>{{('REF'+refund.state) | translate}}</td>
+                <td *ngIf="refund.state === 0"><button type="button" class="btn btn-floating" (click)="acceptRefund(refund)"><i class="material-icons">thumb_up</i></button></td>
+                <td *ngIf="refund.state === 0"><button type="button" class="btn btn-floating" (click)="denyRefund(refund)"><i class=" material-icons ">thumb_down</i></button></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
