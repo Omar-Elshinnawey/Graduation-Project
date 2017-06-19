@@ -9,8 +9,8 @@
     <ng-template #ordersTable>
         <table class="responsive-table">
             <thead>
-                <th>Order Title</th>
-                <th>Customer Username</th>
+                <th>{{ 'ORDERTITLE' | translate }}</th>
+                <th>{{ 'CUSTOMER' | translate }}</th>
             </thead>
 
             <tbody>
@@ -20,6 +20,6 @@
                 </tr>
             </tbody>
         </table>
-        <button type="button" (click)="orders = null" class="btn">Back</button>
+        <button type="button" (click)="orders = null" class="btn">{{ 'BACK' | translate }}</button>
     </ng-template>
 </div>

@@ -15,10 +15,10 @@
 
             <p><strong>{{('STATE' | translate) + ': '}}</strong>{{('STATE'+ order.state) | translate}}</p>
 
-            <button type="button" class="btn red" data-target="modal1">Delete this order</button>
+            <button type="button" class="btn red" data-target="modal1">{{ 'DELBTN' | translate }}</button>
         </div>
 
-        <button type="button" class="btn" (click)="goToOrders()">Back to orders</button>
+        <button type="button" class="btn" (click)="goToOrders()">{{ 'BACKTOORDER' | translate }}</button>
     </div>
 </div>
 
